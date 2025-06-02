@@ -1,0 +1,81 @@
+.ion-padding {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+}
+
+.card-spacing {
+  margin: 20px 0;
+}
+
+.welcome-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+.app-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  margin-bottom: 20px;
+  background: #fff;
+}
+
+.app-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-image-wrapper {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.65);
+  transition: filter 0.3s ease;
+}
+
+.app-card:hover .card-image-wrapper img,
+.app-card:focus .card-image-wrapper img {
+  filter: brightness(0.8);
+}
+
+.card-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 10px;
+  text-shadow: 1.5px 1.5px 5px rgba(0,0,0,0.7);
+  pointer-events: none;
+}
+
+ion-button {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+  height: 36px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --border-radius: 12px;
+  --box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+
+ion-button ion-icon {
+  font-size: 1.1rem; /* Icono un poco más pequeño para armonizar */
+}
+

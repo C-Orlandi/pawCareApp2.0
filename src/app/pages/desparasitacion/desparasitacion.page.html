@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Desparasitación</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModalDesparasitacion()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list *ngIf="desparasitaciones$ | async as desparasitaciones; else cargando">
+    <ion-item *ngFor="let des of desparasitaciones" lines="inset" button (click)="abrirModalDesparasitacion(des)">
+      <ion-label>
+        <h2>{{ des.nombre }}</h2>
+        <p>Dosis: {{ des.dosis || 'N/A' }}</p>
+        <p>Fecha: {{ formatearFecha(des.fecha) }}</p>
+        <p [ngStyle]="{ color: des.aplicada ? 'green' : 'red' }">
+          Estado: {{ des.aplicada ? 'Aplicada' : 'Pendiente' }}
+        </p>
+      </ion-label>
+      <ion-button fill="clear" color="danger" slot="end" (click)="eliminarDesparasitacion(des.did); $event.stopPropagation()">
+        <ion-icon name="trash"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <ion-item *ngIf="desparasitaciones.length === 0">
+      <ion-label text-center>No hay desparasitaciones registradas.</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #cargando>
+    <ion-spinner name="crescent"></ion-spinner>
+    <p class="ion-text-center">Cargando desparasitaciones...</p>
+  </ng-template>
+</ion-content>

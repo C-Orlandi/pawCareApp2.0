@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ desparasitacion ? 'Editar Desparasitación' : 'Nueva Desparasitación' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="desparasitacionForm" (ngSubmit)="guardarDesparasitacion()">
+
+    <ion-item>
+      <ion-label position="floating">Nombre del antiparasitario</ion-label>
+      <ion-input formControlName="nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Dosis</ion-label>
+      <ion-input formControlName="dosis"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Fecha de aplicación</ion-label>
+      <ion-datetime
+        formControlName="fecha"
+        presentation="date"
+        [max]="hoy">
+      </ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Frecuencia</ion-label>
+      <ion-select formControlName="frecuencia">
+        <ion-select-option *ngFor="let f of frecuencias" [value]="f.value">{{ f.label }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Próxima dosis</ion-label>
+      <ion-datetime
+        formControlName="proximaDosis"
+        presentation="date"
+        [readonly]="true"
+        [disabled]="true">
+      </ion-datetime>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label>¿Aplicado?</ion-label>
+      <ion-checkbox slot="end" formControlName="aplicada"></ion-checkbox>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
+      {{ desparasitacion ? 'Actualizar' : 'Guardar' }}
+    </ion-button>
+  </form>
+</ion-content>

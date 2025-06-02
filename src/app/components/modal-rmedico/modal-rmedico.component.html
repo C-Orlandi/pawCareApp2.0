@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Registro Médico Personal</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="registroForm" (ngSubmit)="guardarRegistro()">
+
+    <ion-item>
+      <ion-label position="floating">Fecha de visita</ion-label>
+      <ion-datetime
+        formControlName="fechaVisita"
+        presentation="date"
+        [max]="hoy">
+      </ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Motivo de la visita</ion-label>
+      <ion-input formControlName="motivo"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Veterinario(a)</ion-label>
+      <ion-input formControlName="veterinario"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Diagnóstico</ion-label>
+      <ion-textarea formControlName="diagnostico"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Tratamiento / Recomendaciones</ion-label>
+      <ion-textarea formControlName="tratamiento"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Medicamentos indicados</ion-label>
+      <ion-textarea formControlName="medicamentos"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Notas personales</ion-label>
+      <ion-textarea formControlName="notas"></ion-textarea>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
+      {{ registro ? 'Actualizar' : 'Guardar' }} Registro
+    </ion-button>
+  </form>
+</ion-content>

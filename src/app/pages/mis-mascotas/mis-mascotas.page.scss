@@ -1,0 +1,53 @@
+.mascotas-scroll-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px 0;
+}
+
+.mascotas-scroll {
+  display: flex;
+  gap: 12px;
+  padding: 0 10px;
+}
+
+/* Tarjeta mascota */
+.mascota-card {
+  flex: 0 0 auto;
+  width: 100px;
+  height: 130px;
+  background: #030303;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.959);
+  text-align: center;
+}
+
+.mascota-card img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+}
+
+.mascota-card .nombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 4px;
+}
+
+/* Botón circular */
+.mascota-add-button {
+  flex: 0 0 auto;
+  width: 100px;
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #e9e6e686;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mascota-add-button .add-icon {
+  font-size: 3rem;
+  color:rgb(219, 216, 216);
+}

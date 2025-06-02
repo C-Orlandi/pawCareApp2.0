@@ -1,0 +1,72 @@
+.registro-mascota {
+  --background: #f7f9fc;
+}
+
+.form-card {
+  border-radius: 16px;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+ion-item {
+  --border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+ion-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+ion-input, ion-datetime {
+  font-size: 1rem;
+}
+
+.boton-registrar {
+  margin-top: 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Emoji Selector */
+.emoji-selector {
+  margin-top: 20px;
+
+  span {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #666;
+  }
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  button {
+    font-size: 22px;
+    padding: 6px 12px;
+    border-radius: 50%;
+    background-color: #eee;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .selected {
+    background-color: #3880ff;
+    color: white;
+    border-color: #3880ff;
+  }
+}
+
+.preview-img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  margin-top: 10px;
+}

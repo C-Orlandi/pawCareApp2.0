@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar color="purple">
+    <ion-title>PawCare Admin</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-card class="card-spacing welcome-card">
+    <ion-card-header>
+      <ion-card-title>¡Hola, {{ usuarioLogin }}! 👋</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Bienvenido/a al panel de administración de <strong>PawCare</strong>.
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Card Usuarios -->
+  <ion-card button class="app-card" (click)="goTo('gestionar-usuario')">
+    <div class="card-image-wrapper">
+      <img alt="Usuarios" src="assets/images/admin-usuarios.jpg" />
+      <div class="card-overlay">
+        <ion-card-title>Usuarios</ion-card-title>
+      </div>
+    </div>
+    <ion-card-content>
+      <ion-button expand="full" color="dark" size="large">
+        <ion-icon slot="start" name="people-outline"></ion-icon>
+        Gestionar Usuarios
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Card Mascotas -->
+  <ion-card button class="app-card" (click)="goTo('gestionar-mascota')">
+    <div class="card-image-wrapper">
+      <img alt="Mascotas" src="assets/images/admin-mascotas.jpg" />
+      <div class="card-overlay">
+        <ion-card-title>Mascotas</ion-card-title>
+      </div>
+    </div>
+    <ion-card-content>
+      <ion-button expand="full" color="dark" size="large">
+        <ion-icon slot="start" name="paw-outline"></ion-icon>
+        Gestionar Mascotas
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
