@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Historial de Notificaciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="recordatorios$ | async as recordatorios; else cargando">
+    <ion-list>
+      <ion-item *ngFor="let r of recordatorios" lines="none">
+        <ion-label>
+          <h2>{{ r.medicamento }}</h2>
+          <p>
+            <ion-icon name="time-outline"></ion-icon>
+            <strong>Inicio:</strong> {{ r.horaInicio?.toDate() | date:'shortTime' }}<br />
+            <strong>Frecuencia:</strong> {{ r.frecuencia }}x/día · {{ r.duracion }} días
+          </p>
+          <p *ngIf="r.estado">
+            <strong>Estado:</strong> {{ r.estado }}
+          </p>
+          <p>
+            <small>Registrado: {{ r.creadoEn?.toDate() | date:'short' }}</small>
+          </p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-template #cargando>
+    <ion-spinner name="crescent" class="ion-margin-top"></ion-spinner>
+  </ng-template>
+</ion-content>

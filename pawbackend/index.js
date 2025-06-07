@@ -7,16 +7,21 @@ const path = require('path');
 
 const app = express();
 app.use(cors());
+app.use(express.json()); // Para poder leer JSON en PUT/POST
 
-// Inicializar Firebase Admin
+// Inicializar Firebase Admin (solo una vez)
 const serviceAccount = require('./serviceAccountKey.json');
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'pawcareapp-c64ee.firebasestorage.app',
-});
-
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: 'pawcareapp-c64ee.firebasestorage.app',
+  });
+}
 const bucket = admin.storage().bucket();
+
+// Importar rutas de usuarios
+const userRoutes = require('./users');
+app.use('/api', userRoutes); // Monta las rutas del archivo users.js bajo /api
 
 // Configurar Multer (subida a carpeta temporal)
 const upload = multer({ dest: 'uploads/' });
@@ -59,7 +64,6 @@ app.post('/upload', upload.single('foto'), async (req, res) => {
     });
 
     console.log('✅ Imagen subida con éxito:', url);
-
     res.status(200).json({ url });
   } catch (error) {
     console.error('🔥 Error al subir archivo:', error);

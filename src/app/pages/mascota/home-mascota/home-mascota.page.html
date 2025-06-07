@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>{{ mascota?.nombre }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="mascota-header">
+    <img [src]="mascota?.imagen" alt="Foto de mascota" class="mascota-img" />
+    <h2>{{ mascota?.nombre }}</h2>
+  </div>
+
+  <ion-list>
+    <ion-item button (click)="goTo('carnet')">
+      <ion-label>Carnet</ion-label>
+    </ion-item>
+    <ion-item button (click)="goTo('historial')">
+      <ion-label>Registro Médico Personal</ion-label>
+    </ion-item>
+    <ion-item *ngIf="mostrarVacunas" button (click)="goTo('vacunas')">
+      <ion-label>Vacunas</ion-label>
+    </ion-item>
+    <ion-item button (click)="goTo('desparasitacion')">
+      <ion-label>Desparasitación</ion-label>
+    </ion-item>
+    <ion-item *ngIf="esExotico" button (click)="goTo('regalimentacion')">
+      <ion-label>Registro de Alimentación</ion-label>
+    </ion-item>
+    <ion-item *ngIf="esExotico" button (click)="goTo('controlpyc')">
+      <ion-label>Control de Peso y Crecimiento</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

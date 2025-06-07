@@ -1,0 +1,74 @@
+<ion-header [translucent]="true"></ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="banner-container">
+    <img src="../../../../assets/img/logo4.jpg" alt="Banner login" class="banner-image" />
+  </div>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-subtitle>Ingreso al sistema</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content [formGroup]="loginForm">
+
+      <ion-item>
+        <ion-input
+          formControlName="email"
+          type="email"
+          label="Usuario:"
+          labelPlacement="floating"
+          placeholder="ejemplo@correo.com">
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger" *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">
+        El correo es obligatorio
+      </ion-text>
+      <ion-text color="danger" *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
+        El correo es inválido
+      </ion-text>
+
+      <ion-item>
+        <ion-input
+          formControlName="pass"
+          type="password"
+          label="Contraseña:"
+          labelPlacement="floating"
+          placeholder="mínimo 6 caracteres">
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger" *ngIf="loginForm.get('pass')?.hasError('required') && loginForm.get('pass')?.touched">
+        La contraseña es obligatoria
+      </ion-text>
+      <ion-text color="danger" *ngIf="loginForm.get('pass')?.hasError('minlength') && loginForm.get('pass')?.touched">
+        La contraseña debe tener mínimo 6 caracteres
+      </ion-text>
+
+      <ion-button 
+        expand="full" 
+        color="dark" 
+        (click)="login()" 
+        [disabled]="loginForm.invalid"
+        style="margin-top: 20px;">
+        Ingresar
+      </ion-button>
+
+      <ion-button 
+        expand="full" 
+        color="dark" 
+        (click)="register()" 
+        fill="clear"
+        style="margin-top: 10px;">
+        Registrarse
+      </ion-button>
+
+      <ion-item lines="none" style="margin-top: 15px; justify-content: center;">
+        <ion-label>
+          <a (click)="recovery()" style="cursor: pointer; color: var(--ion-color-primary);">¿Olvidaste tu contraseña?</a>
+        </ion-label>
+      </ion-item>
+
+    </ion-card-content>
+  </ion-card>
+</ion-content>

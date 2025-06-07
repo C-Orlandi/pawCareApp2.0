@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar color="purple">
+    <ion-title>Mis Mascotas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="mascotas-scroll-container">
+    <div class="mascotas-scroll">
+      <!-- Tarjetas de mascotas -->
+      <ion-card
+        class="mascota-card"
+        *ngFor="let mascota of mascotas"
+        (click)="mostrarOpcionesMascota(mascota)"
+      >
+        <img
+          [src]="mascota.imagen || 'assets/mascotas/default.jpg'"
+          alt="Mascota"
+        />
+        <div class="nombre">{{ mascota.nombre }}</div>
+      </ion-card>
+
+      <!-- Botón agregar -->
+      <div class="mascota-add-button" (click)="agregarMascota()">
+        <ion-icon name="add" class="add-icon"></ion-icon>
+      </div>
+    </div>
+  </div>
+</ion-content>

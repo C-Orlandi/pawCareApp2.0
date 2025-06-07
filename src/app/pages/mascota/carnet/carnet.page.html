@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>Carnet de {{ mascota?.nombre }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card class="carnet-card">
+    <img [src]="mascota?.imagen || 'assets/mascotas/default.jpg'" alt="Foto de mascota" class="foto-carnet" />
+
+    <ion-card-header>
+      <ion-card-title>{{ mascota?.nombre }}</ion-card-title>
+      <ion-card-subtitle>{{ mascota?.tipo }} - {{ mascota?.raza }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list lines="none">
+        <ion-item>
+          <ion-label><strong>Especie:</strong></ion-label>
+          <ion-text>{{ mascota?.tipo }}</ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label><strong>Raza:</strong></ion-label>
+          <ion-text>{{ mascota?.raza }}</ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label><strong>Sexo:</strong></ion-label>
+          <ion-text>{{ mascota?.sexo }}</ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label><strong>Color:</strong></ion-label>
+          <ion-text>{{ mascota?.color }}</ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label><strong>Nro. Chip:</strong></ion-label>
+          <ion-text>{{ mascota?.chip || 'No registrado' }}</ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label><strong>Contacto Dueño:</strong></ion-label>
+          <ion-text>{{ mascota?.dueno?.contacto || 'Sin contacto' }}</ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label><strong>Dueño:</strong></ion-label>
+          <ion-text>{{ mascota?.dueno?.nombre || 'No asignado' }}</ion-text>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

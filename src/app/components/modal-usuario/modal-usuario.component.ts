@@ -61,6 +61,13 @@ export class ModalUsuarioComponent implements OnInit {
           creadoEn: new Date()
         });
 
+        await this.authService.actualizarUsuarioEnAuth(
+        usuarioActualizado.uid,
+        usuarioActualizado.email,
+        usuarioActualizado.pass
+      ).toPromise();
+
+
         this.modalCtrl.dismiss(usuarioActualizado);
       } else {
         // 🟢 Crear usuario nuevo (Auth + Firestore)

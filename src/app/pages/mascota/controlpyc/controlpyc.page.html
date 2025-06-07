@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Control de Peso y Crecimiento</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModalControl()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+ <!-- <ng-container *ngIf="cargando; else mostrarContenido">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p class="ion-text-center">Cargando controles...</p>
+  </ng-container>
+
+  <ng-template #mostrarContenido>
+    <ion-list *ngIf="controles.length > 0; else sinDatos">
+      <ion-item *ngFor="let item of controles" lines="inset" button (click)="abrirModalControl(item)">
+        <ion-label>
+          <h2>Peso: {{ item.peso }} kg</h2>
+          <p>Tamaño: {{ item.tamano }} cm</p>
+          <p>Fecha: {{ formatearFecha(item.fecha) }}</p>
+          <p>Observaciones: {{ item.observaciones }}</p>
+        </ion-label>
+        <ion-button fill="clear" color="danger" slot="end" (click)="eliminarControl(item.cid); $event.stopPropagation()">
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+    <ng-template #sinDatos>
+      <ion-item>
+        <ion-label class="ion-text-center">No hay registros de control.</ion-label>
+      </ion-item>
+    </ng-template>
+  </ng-template>
+!-->
+</ion-content>

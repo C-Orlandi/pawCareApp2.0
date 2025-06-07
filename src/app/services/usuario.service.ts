@@ -1,7 +1,9 @@
+// usuario.service.ts
 import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, doc, docData, setDoc, updateDoc, deleteDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Usuario } from '../interfaces/usuario';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,37 +12,45 @@ export class UsuariosService {
 
   private collectionName = 'usuarios';
 
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  // Obtener todos los usuarios
   getUsuarios(): Observable<Usuario[]> {
     const usuariosRef = collection(this.firestore, this.collectionName);
     return collectionData(usuariosRef, { idField: 'uid' }) as Observable<Usuario[]>;
   }
 
-  // Obtener un usuario por UID
   getUsuarioPorUid(uid: string): Observable<Usuario | undefined> {
     const usuarioDocRef = doc(this.firestore, `${this.collectionName}/${uid}`);
     return docData(usuarioDocRef, { idField: 'uid' }) as Observable<Usuario | undefined>;
   }
 
-  // Crear un usuario nuevo (usa setDoc con merge: false)
   crearUsuario(usuario: Usuario): Promise<void> {
     const usuarioDocRef = doc(this.firestore, `${this.collectionName}/${usuario.uid}`);
     return setDoc(usuarioDocRef, usuario);
   }
 
-  // Actualizar usuario (sin enviar uid dentro del objeto a actualizar)
   actualizarUsuario(usuario: Usuario): Promise<void> {
     const usuarioDocRef = doc(this.firestore, `${this.collectionName}/${usuario.uid}`);
-    // Desestructura para eliminar uid y no actualizarlo dentro del documento
     const { uid, ...data } = usuario;
     return updateDoc(usuarioDocRef, data);
   }
 
-  // Eliminar usuario
-  eliminarUsuario(uid: string): Promise<void> {
-    const usuarioDocRef = doc(this.firestore, `${this.collectionName}/${uid}`);
-    return deleteDoc(usuarioDocRef);
+  // Modificamos para eliminar en Firestore y luego en Firebase Auth via backend
+  async eliminarUsuario(uid: string): Promise<void> {
+    try {
+      // Eliminar de Firestore: usuarios y duenos
+      const usuarioDocRef = doc(this.firestore, `usuarios/${uid}`);
+      const duenoDocRef = doc(this.firestore, `duenos/${uid}`);
+
+      await deleteDoc(usuarioDocRef);
+      await deleteDoc(duenoDocRef);
+
+      // Eliminar de Firebase Auth via backend
+      await this.authService.eliminarUsuarioPorUid(uid).toPromise();
+
+    } catch (error) {
+      console.error('Error eliminando usuario:', error);
+      throw error;
+    }
   }
 }

@@ -1,0 +1,41 @@
+.perfil-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.avatar-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #9c27b0; // Morado
+  transition: transform 0.2s ease;
+}
+
+.avatar-container:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+ion-avatar {
+  width: 100%;
+  height: 100%;
+}
+
+.nombre {
+  font-size: 1.5rem;
+  margin-top: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.subtitulo {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 5px;
+  text-align: center;
+}
+

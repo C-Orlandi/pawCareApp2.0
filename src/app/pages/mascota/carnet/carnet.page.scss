@@ -1,0 +1,25 @@
+.carnet-card {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.foto-carnet {
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: cover;
+  border-bottom: 2px solid #ccc;
+}
+
+ion-card-title {
+  font-size: 1.5rem;
+  margin-top: 8px;
+}
+
+ion-item {
+  --inner-padding-end: 0;
+}

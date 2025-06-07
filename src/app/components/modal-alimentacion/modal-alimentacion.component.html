@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ alimentacion ? 'Editar Registro' : 'Nuevo Registro' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="alimentacionForm" (ngSubmit)="guardarAlimentacion()">
+
+    <ion-item>
+      <ion-label position="floating">Fecha</ion-label>
+      <ion-datetime formControlName="fecha" presentation="date" [max]="hoy"></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Tipo de alimento</ion-label>
+      <ion-select formControlName="tipoAlimento">
+        <ion-select-option value="Fruta">Fruta</ion-select-option>
+        <ion-select-option value="Insectos">Insectos</ion-select-option>
+        <ion-select-option value="Verdura">Verdura</ion-select-option>
+        <ion-select-option value="Otro">Otro</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Nombre del alimento</ion-label>
+      <ion-input formControlName="nombreAlimento"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Cantidad ofrecida</ion-label>
+      <ion-input formControlName="cantidad" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Método</ion-label>
+      <ion-select formControlName="metodo">
+        <ion-select-option value="Manual">Manual</ion-select-option>
+        <ion-select-option value="Automática">Automática</ion-select-option>
+        <ion-select-option value="Forzada">Forzada</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>¿Comió?</ion-label>
+      <ion-radio-group formControlName="comio">
+        <ion-item>
+          <ion-label>Sí</ion-label>
+          <ion-radio value="true"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>No</ion-label>
+          <ion-radio value="false"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Observaciones digestivas</ion-label>
+      <ion-textarea formControlName="obsDigestivas"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Observaciones adicionales</ion-label>
+      <ion-textarea formControlName="obsAdicionales"></ion-textarea>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
+      {{ alimentacion ? 'Actualizar' : 'Guardar' }} Registro
+    </ion-button>
+  </form>
+</ion-content>

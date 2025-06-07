@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ esEdicion ? 'Editar' : 'Nuevo' }} Registro</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="formulario" (ngSubmit)="guardar()">
+    <ion-item>
+      <ion-label position="stacked">Fecha</ion-label>
+      <ion-datetime formControlName="fecha" display-format="DD/MM/YYYY"></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Peso</ion-label>
+      <ion-input type="number" formControlName="peso"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Unidad</ion-label>
+      <ion-select formControlName="unidad">
+        <ion-select-option value="kg">kg</ion-select-option>
+        <ion-select-option value="g">g</ion-select-option>
+        <ion-select-option value="lb">lb</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Condición Corporal</ion-label>
+      <ion-input formControlName="condicionCorporal"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Actividad Física</ion-label>
+      <ion-input formControlName="actividadFisica"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Observaciones</ion-label>
+      <ion-textarea formControlName="observaciones"></ion-textarea>
+    </ion-item>
+
+    <ion-button expand="full" type="submit" [disabled]="formulario.invalid">
+      {{ esEdicion ? 'Actualizar' : 'Guardar' }}
+    </ion-button>
+  </form>
+</ion-content>

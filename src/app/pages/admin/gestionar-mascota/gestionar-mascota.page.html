@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Gestionar Mascotas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModal()">
+        <ion-buttons slot="add"></ion-buttons>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item *ngFor="let mascota of mascotas">
+    <ion-label>
+      <h2>{{ mascota.nombre }}</h2>
+      <p>Tipo: {{ mascota.tipo }}</p>
+      <p>Dueño: {{ mascota.nombreDueno }}</p>
+    </ion-label>
+
+      <ion-button slot="end" color="warning" size="small" (click)="abrirModal(mascota)">
+      <ion-icon name="create" slot="icon-only"></ion-icon>
+      </ion-button>
+
+    <ion-button slot="end" color="danger" size="small" (click)="eliminarMascota(mascota.mid)">
+      <ion-icon name="trash" slot="icon-only"></ion-icon>
+    </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
