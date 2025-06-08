@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonicModule, LoadingController, MenuController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import { FcmService } from 'src/app/services/fcm.service'; // Ajusta ruta según tu estructura
 import Swal from 'sweetalert2';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { Usuario } from 'src/app/interfaces/usuario';
@@ -31,8 +30,7 @@ export class LoginPage implements OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private menuController: MenuController,
-    private firestore: Firestore,
-    private fcmService: FcmService
+    private firestore: Firestore
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -42,12 +40,6 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {
     this.menuController.enable(false);
-
-    // Opcional: si ya tienes usuario guardado en localStorage al cargar login, intentamos registrar token
-    const usuario = localStorage.getItem('usuarioLogin');
-    if (usuario) {
-      this.fcmService.solicitarPermisoYGuardarToken();
-    }
   }
 
   async login() {
@@ -84,9 +76,6 @@ export class LoginPage implements OnInit {
         if (usuarioData) {
           localStorage.setItem('usuarioLogin', JSON.stringify(usuarioData));
           console.log('Usuario logeado:', usuarioData);
-
-          // Aquí llamamos para pedir permiso y guardar token FCM
-          await this.fcmService.solicitarPermisoYGuardarToken();
         }
 
         await loading.dismiss();
@@ -116,7 +105,7 @@ export class LoginPage implements OnInit {
         confirmButtonText: 'OK',
         heightAuto: false
       });
-
+      
       this.loginForm.reset();
     }
   }

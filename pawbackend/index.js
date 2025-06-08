@@ -4,29 +4,39 @@ const multer = require('multer');
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
+const notiRoutes = require('./noti');
+const userRoutes = require('./users');
+
+require('dotenv').config();
 
 const app = express();
-app.use(cors());
-app.use(express.json()); // Para poder leer JSON en PUT/POST
 
-// Inicializar Firebase Admin (solo una vez)
-const serviceAccount = require('./serviceAccountKey.json');
+// Middleware global — debe ir primero para habilitar CORS y parsear JSON
+app.use(cors());
+app.use(express.json());
+
+// ✅ Inicializar Firebase Admin usando .env
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    storageBucket: 'pawcareapp-c64ee.firebasestorage.app',
+    credential: admin.credential.cert({
+      projectId: process.env.FB_PROJECT_ID,
+      clientEmail: process.env.FB_CLIENT_EMAIL,
+      privateKey: process.env.FB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+    storageBucket: process.env.FB_BUCKET,
   });
 }
+
 const bucket = admin.storage().bucket();
 
-// Importar rutas de usuarios
-const userRoutes = require('./users');
-app.use('/api', userRoutes); // Monta las rutas del archivo users.js bajo /api
+// 📦 Rutas
+app.use('/api', notiRoutes);
+app.use('/api', userRoutes);
 
 // Configurar Multer (subida a carpeta temporal)
 const upload = multer({ dest: 'uploads/' });
 
-// 🔁 Ruta para subir imagen
+// Ruta para subir imagen
 app.post('/upload', upload.single('foto'), async (req, res) => {
   const archivo = req.file;
 
@@ -71,12 +81,17 @@ app.post('/upload', upload.single('foto'), async (req, res) => {
   }
 });
 
-// Ruta simple para verificar backend activo
 app.get('/', (req, res) => {
   res.send('Servidor PawCare backend activo 🚀');
 });
 
-// Iniciar servidor
-app.listen(3000, () => {
-  console.log('✅ Backend corriendo en http://localhost:3000');
+
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// ▶️ Iniciar servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Backend corriendo en http://localhost:${PORT}`);
 });

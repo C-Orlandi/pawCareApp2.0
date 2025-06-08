@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class EmailService {
-  private backendUrl = 'http://localhost:3001/enviar-email-recordatorio';
+  private backendUrl = 'http://localhost:3000/api/enviar-email-recordatorio';
 
   constructor(private http: HttpClient) {}
 

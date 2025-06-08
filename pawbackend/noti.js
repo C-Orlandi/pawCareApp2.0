@@ -1,21 +1,16 @@
+// noti.js
 const express = require('express');
 const nodemailer = require('nodemailer');
-const app = express();
-const cors = require('cors');
+const router = express.Router(); // Usa router, no app
 
-app.use(cors());
-app.use(express.json());
-
-
-app.post('/enviar-email-recordatorio', async (req, res) => {
+router.post('/enviar-email-recordatorio', async (req, res) => {
   const { email, medicamento, dosis, duracion, frecuencia, horaInicio } = req.body;
 
-  // Configura transporter (por ejemplo con Gmail)
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: 'pawcare.apppaw@gmail.com',
-      pass: 'uymw txuv sodr nsaw'
+      pass: 'dkab ymkl wivh jmbz' // Recomendación: usa variables de entorno
     }
   });
 
@@ -35,4 +30,4 @@ app.post('/enviar-email-recordatorio', async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log('Servidor backend escuchando en puerto 3001'));
+module.exports = router;

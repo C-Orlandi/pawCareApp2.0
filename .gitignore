@@ -68,4 +68,5 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
-pawbackend/serviceAccountKey.json.json
+pawbackend/serviceAccountKey.json
+pawbackend/.env
