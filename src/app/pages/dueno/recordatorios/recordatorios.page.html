@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Historial de Recordatorios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="!cargando; else cargandoTemplate">
+    <ion-list *ngIf="recordatorios.length > 0; else sinRecordatorios">
+      <ion-item *ngFor="let recordatorio of recordatorios">
+        <ion-label>
+          <h2>Tipo: {{ recordatorio.tipo }}</h2>
+          <p>Mascota: {{ recordatorio.nombreMascota }}</p>
+          <p>Nombre: {{ recordatorio.nombre }}</p>
+          <p>Frecuencia: {{ formatearFrecuencia(recordatorio.frecuencia) }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-template #cargandoTemplate>
+    <ion-spinner name="crescent"></ion-spinner>
+    <p class="ion-text-center">Cargando recordatorios...</p>
+  </ng-template>
+
+  <ng-template #sinRecordatorios>
+    <ion-item>
+      <ion-label>No hay recordatorios disponibles.</ion-label>
+    </ion-item>
+  </ng-template>
+</ion-content>

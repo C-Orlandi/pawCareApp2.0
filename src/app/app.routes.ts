@@ -92,8 +92,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/dueno/notificaciones/notificaciones.page').then( m => m.NotificacionesPage)
   },
   {
-    path: 'h-recordatorio',
-    loadComponent: () => import('./pages/dueno/h-recordatorio/h-recordatorio.page').then( m => m.HRecordatorioPage)
+    path: 'recordatorio',
+    loadComponent: () => import('./pages/dueno/recordatorios/recordatorios.page').then( m => m.RecordatoriosPage)
   },
   {
     path: 'carnet',

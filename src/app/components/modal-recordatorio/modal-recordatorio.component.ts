@@ -1,7 +1,9 @@
+// modal-recordatorio.component.ts
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-modal-recordatorio',
@@ -10,10 +12,36 @@ import { IonicModule } from '@ionic/angular';
   standalone: true,
   imports: [CommonModule, IonicModule, ReactiveFormsModule]
 })
-export class ModalRecordatorioComponent  implements OnInit {
+export class ModalRecordatorioComponent implements OnInit {
+  @Input() nombreVacuna!: string;
+  @Input() fechaVacuna!: string;
 
-  constructor() { }
+  recordatorioForm!: FormGroup;
 
-  ngOnInit() {}
+  constructor(
+    private fb: FormBuilder,
+    private modalCtrl: ModalController
+  ) {}
 
+  ngOnInit() {
+    this.recordatorioForm = this.fb.group({
+      frecuenciaMeses: [null, [Validators.required, Validators.min(1)]],
+      hora: ['08:00']
+    });
+  }
+
+  guardar() {
+    if (this.recordatorioForm.invalid) return;
+
+    this.modalCtrl.dismiss({
+      guardado: true,
+      recordatorio: this.recordatorioForm.value
+    });
+  }
+
+  cancelar() {
+    this.modalCtrl.dismiss({
+      guardado: false
+    });
+  }
 }

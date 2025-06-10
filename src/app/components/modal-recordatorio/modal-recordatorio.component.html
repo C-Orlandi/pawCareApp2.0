@@ -1,8 +1,9 @@
+<!-- modal-recordatorio.component.html -->
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Crear Recordatorio</ion-title>
+    <ion-title>Crear Recordatorio para {{ nombreVacuna }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button>
+      <ion-button (click)="cancelar()">
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -10,39 +11,23 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form>
+  <form [formGroup]="recordatorioForm" (ngSubmit)="guardar()">
     <ion-item>
-      <ion-label position="floating">Nombre de la Vacuna</ion-label>
-      <ion-input></ion-input>
+      <ion-label position="floating">Frecuencia (meses)</ion-label>
+      <ion-input type="number" formControlName="frecuenciaMeses" min="1" required></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Fecha de Aplicación</ion-label>
-      <ion-datetime>
-      </ion-datetime>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating">Frecuencia</ion-label>
-      <ion-select formControlName="frecuencia" placeholder="Selecciona frecuencia">
-        <ion-select-option value="diaria">Diaria</ion-select-option>
-        <ion-select-option value="semanal">Semanal</ion-select-option>
-        <ion-select-option value="mensual">Mensual</ion-select-option>
-        <ion-select-option value="anual">Anual</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating">Hora de inicio</ion-label>
+      <ion-label position="floating">Hora de notificación</ion-label>
       <ion-datetime
-        formControlName="horaInicio"
+        formControlName="hora"
         presentation="time"
-        placeholder="Seleccionar hora">
-      </ion-datetime>
+        placeholder="Seleccionar hora"
+      ></ion-datetime>
     </ion-item>
 
-    <ion-button expand="full" class="ion-margin-top">
-      Guardar Recordatorio
+    <ion-button expand="full" type="submit" class="ion-margin-top" [disabled]="recordatorioForm.invalid">
+      Guardar recordatorio
     </ion-button>
   </form>
 </ion-content>

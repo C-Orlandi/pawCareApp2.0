@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { Firestore, collection, addDoc, updateDoc, doc } from '@angular/fire/firestore';
-import Swal from 'sweetalert2';
 import { EmailService } from 'src/app/services/email.service';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ModalRecordatorioComponent } from '../modal-recordatorio/modal-recordatorio.component';
 
 @Component({
   selector: 'app-modal-vacuna',
@@ -18,42 +19,61 @@ export class ModalVacunaComponent implements OnInit {
   @Input() vacuna: any;
 
   vacunaForm!: FormGroup;
-  crearRecordatorio: boolean = false;
-  usuarioEmail: string = 'sin-correo@pawcare.com';  // valor por defecto
+  usuarioEmail: string = 'sin-correo@pawcare.com';
+  recordatorioData: any = null;
 
   constructor(
     private fb: FormBuilder,
     private firestore: Firestore,
-    private modalController: ModalController,
     private toastController: ToastController,
+    private modalCtrl: ModalController,
     private emailService: EmailService
   ) {}
 
   ngOnInit() {
-    // Inicializar formulario
     this.vacunaForm = this.fb.group({
       nombre: [this.vacuna?.nombre || '', Validators.required],
       dosis: [this.vacuna?.dosis || '', Validators.required],
       fecha: [this.vacuna?.fecha || '', Validators.required],
-      frecuencia: [this.vacuna?.frecuencia || ''],
-      frecuenciaPersonalizada: [this.vacuna?.frecuenciaPersonalizada || '']
+      crearRecordatorio: [false]
     });
 
-    // Obtener email del usuario desde localStorage
     const usuario = localStorage.getItem('usuarioLogin');
     if (usuario) {
       const usuarioParsed = JSON.parse(usuario);
       if (usuarioParsed.email) {
         this.usuarioEmail = usuarioParsed.email;
       }
-      console.log('📧 Email del usuario:', this.usuarioEmail);
-    } else {
-      console.warn('⚠️ No se encontró usuarioLogin en localStorage');
     }
+
+    this.vacunaForm.get('crearRecordatorio')?.valueChanges.subscribe(async (valor) => {
+      if (valor === true) {
+        await this.abrirModalRecordatorio();
+      } else {
+        this.recordatorioData = null;
+      }
+    });
   }
 
-  cancelar() {
-    this.modalController.dismiss();
+  async abrirModalRecordatorio() {
+    const modal = await this.modalCtrl.create({
+      component: ModalRecordatorioComponent,
+      componentProps: {
+        nombreVacuna: this.vacunaForm.value.nombre,
+        fechaVacuna: this.vacunaForm.value.fecha
+      }
+    });
+
+    modal.onDidDismiss().then((resultado) => {
+      if (resultado.data?.guardado) {
+        this.recordatorioData = resultado.data.recordatorio;
+      } else {
+        this.vacunaForm.get('crearRecordatorio')?.setValue(false, { emitEvent: false });
+        this.recordatorioData = null;
+      }
+    });
+
+    await modal.present();
   }
 
   async presentToast(message: string) {
@@ -65,100 +85,54 @@ export class ModalVacunaComponent implements OnInit {
     toast.present();
   }
 
-  preguntarRecordatorio() {
-    const frecuencia = this.vacunaForm.value.frecuencia;
-    const personalizada = this.vacunaForm.value.frecuenciaPersonalizada;
-
-    if (frecuencia === 'personalizada' && !personalizada) {
-      this.presentToast('Especifica la frecuencia personalizada');
-      return;
-    }
-
-    if (frecuencia) {
-      const texto = frecuencia === 'personalizada' ? `${personalizada}` : frecuencia;
-      Swal.fire({
-        title: '¿Deseas crear un recordatorio?',
-        text: `Se repetirá cada ${texto}.`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, crear',
-        cancelButtonText: 'No'
-      }).then((result) => {
-        this.crearRecordatorio = result.isConfirmed;
-        this.guardarVacuna();
-      });
-    } else {
-      this.guardarVacuna();
-    }
-  }
-
   async guardarVacuna() {
     if (this.vacunaForm.invalid || !this.mid) return;
 
     const formValue = this.vacunaForm.value;
-    const frecuenciaFinal = formValue.frecuencia === 'personalizada'
-      ? formValue.frecuenciaPersonalizada
-      : formValue.frecuencia;
-
     const formData = {
       nombre: formValue.nombre,
       dosis: formValue.dosis,
       fecha: formValue.fecha,
-      frecuencia: frecuenciaFinal,
       mid: this.mid,
       creadaEn: new Date()
     };
 
-    let vacunaId = '';
-
     try {
+      let vacunaId = '';
+
       if (this.vacuna?.vid) {
         await updateDoc(doc(this.firestore, 'vacunasMascotas', this.vacuna.vid), formData);
         vacunaId = this.vacuna.vid;
-        this.presentToast('Vacuna actualizada');
-        console.log('✏️ Vacuna actualizada:', formData);
       } else {
         const docRef = await addDoc(collection(this.firestore, 'vacunasMascotas'), formData);
         vacunaId = docRef.id;
         await updateDoc(doc(this.firestore, 'vacunasMascotas', vacunaId), { vid: vacunaId });
-        this.presentToast('Vacuna guardada');
-        console.log('📥 Vacuna creada:', formData);
       }
 
-      if (this.crearRecordatorio) {
-        const recordatorioRef = await addDoc(collection(this.firestore, 'recordatorios'), {
+      // Guardar recordatorio si fue creado
+      if (this.recordatorioData) {
+        const recordatorioPayload = {
+          creadoEn: new Date(),
+          frecuencia: this.recordatorioData.frecuenciaMeses,
+          hora: this.recordatorioData.hora || null,
           vid: vacunaId,
-          tipo: 'vacuna',
-          mid: this.mid,
-          fecha: formValue.fecha,
-          frecuencia: frecuenciaFinal,
-          creadaEn: new Date(),
-          rid: '' // se actualizará luego
-        });
+          rid: '', // temporal, se setea después
+          tipo: 'vacuna'
+        };
 
+        const recordatorioRef = await addDoc(collection(this.firestore, 'recordatorios'), recordatorioPayload);
         await updateDoc(doc(this.firestore, 'recordatorios', recordatorioRef.id), {
           rid: recordatorioRef.id
         });
 
-        // Usar el email del usuario que obtuvimos en ngOnInit
-        const email = this.usuarioEmail;
-
-        console.log('📨 Enviando correo a:', email);
-        console.log('📧 Datos correo:', {
-          vacuna: formData.nombre,
-          dosis: formData.dosis,
-          fecha: new Date(formData.fecha).toLocaleDateString(),
-          frecuencia: frecuenciaFinal
-        });
-
+        // Enviar correo
         this.emailService.enviarEmailRecordatorio({
-          email,
+          email: this.usuarioEmail,
           tipo: 'vacuna',
           datos: {
             vacuna: formData.nombre,
-            dosis: formData.dosis,
-            fecha: new Date(formData.fecha).toLocaleDateString(),
-            frecuencia: frecuenciaFinal
+            frecuencia: this.recordatorioData.frecuenciaMeses,
+            hora: this.recordatorioData.hora || 'No especificada'
           }
         }).subscribe({
           next: () => console.log('✅ Correo enviado exitosamente'),
@@ -166,14 +140,14 @@ export class ModalVacunaComponent implements OnInit {
         });
       }
 
-      this.modalController.dismiss(true);
+      this.presentToast(this.vacuna ? 'Vacuna actualizada' : 'Vacuna guardada');
+      this.modalCtrl.dismiss(true);
     } catch (error) {
       console.error('❌ Error al guardar vacuna:', error);
       this.presentToast('Error al guardar la vacuna');
     }
   }
-
   cerrar() {
-    this.modalController.dismiss(false);
+    this.modalCtrl.dismiss(false);
   }
 }
