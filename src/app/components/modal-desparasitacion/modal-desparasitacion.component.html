@@ -2,22 +2,24 @@
   <ion-toolbar color="primary">
     <ion-title>{{ desparasitacion ? 'Editar Desparasitación' : 'Nueva Desparasitación' }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">Cerrar</ion-button>
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="desparasitacionForm" (ngSubmit)="guardarDesparasitacion()">
+  <form [formGroup]="desparasitacionForm" (ngSubmit)="preguntarRecordatorio()">
 
     <ion-item>
       <ion-label position="floating">Nombre del antiparasitario</ion-label>
-      <ion-input formControlName="nombre"></ion-input>
+      <ion-input formControlName="nombre" type="text" required></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating">Dosis</ion-label>
-      <ion-input formControlName="dosis"></ion-input>
+      <ion-input formControlName="dosis" type="text"></ion-input>
     </ion-item>
 
     <ion-item>
@@ -25,33 +27,29 @@
       <ion-datetime
         formControlName="fecha"
         presentation="date"
-        [max]="hoy">
+        placeholder="Seleccionar fecha"
+        required>
       </ion-datetime>
     </ion-item>
 
     <ion-item>
-      <ion-label>Frecuencia</ion-label>
-      <ion-select formControlName="frecuencia">
-        <ion-select-option *ngFor="let f of frecuencias" [value]="f.value">{{ f.label }}</ion-select-option>
+      <ion-label position="floating">Frecuencia</ion-label>
+      <ion-select formControlName="frecuencia" interface="popover">
+        <ion-select-option value="">Sin repetición</ion-select-option>
+        <ion-select-option value="1 mes">Cada 1 mes</ion-select-option>
+        <ion-select-option value="3 meses">Cada 3 meses</ion-select-option>
+        <ion-select-option value="6 meses">Cada 6 meses</ion-select-option>
+        <ion-select-option value="12 meses">Cada 12 meses</ion-select-option>
+        <ion-select-option value="personalizada">Personalizar</ion-select-option>
       </ion-select>
     </ion-item>
 
-    <ion-item>
-      <ion-label>Próxima dosis</ion-label>
-      <ion-datetime
-        formControlName="proximaDosis"
-        presentation="date"
-        [readonly]="true"
-        [disabled]="true">
-      </ion-datetime>
+    <ion-item *ngIf="desparasitacionForm.value.frecuencia === 'personalizada'">
+      <ion-label position="floating">Frecuencia Personalizada</ion-label>
+      <ion-input formControlName="frecuenciaPersonalizada" type="text" placeholder="Ej: cada 10 días"></ion-input>
     </ion-item>
 
-    <ion-item lines="full">
-      <ion-label>¿Aplicado?</ion-label>
-      <ion-checkbox slot="end" formControlName="aplicada"></ion-checkbox>
-    </ion-item>
-
-    <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
+    <ion-button expand="full" type="submit" class="ion-margin-top">
       {{ desparasitacion ? 'Actualizar' : 'Guardar' }}
     </ion-button>
   </form>

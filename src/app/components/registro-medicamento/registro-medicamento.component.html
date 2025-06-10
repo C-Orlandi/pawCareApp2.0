@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>Recordatorio Medicamento</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="recordatorioForm" (ngSubmit)="guardar()">
+    <ion-item>
+      <ion-label position="floating">Medicamento</ion-label>
+      <ion-input formControlName="medicamento"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Dosis</ion-label>
+      <ion-input formControlName="dosis"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Duración (días)</ion-label>
+      <ion-input type="number" formControlName="duracion"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Frecuencia diaria</ion-label>
+      <ion-input type="number" formControlName="frecuencia"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Hora de inicio</ion-label>
+      <ion-datetime presentation="time" formControlName="horaInicio"></ion-datetime>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
+      Crear Recordatorio
+    </ion-button>
+  </form>
+</ion-content>

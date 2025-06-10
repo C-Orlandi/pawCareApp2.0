@@ -8,12 +8,9 @@ export class EmailService {
   constructor(private http: HttpClient) {}
 
   enviarEmailRecordatorio(data: {
-    email: string,
-    medicamento: string,
-    dosis: string,
-    duracion: number,
-    frecuencia: number,
-    horaInicio: string
+    email: string;
+    tipo: 'medicamento' | 'vacuna' | 'desparasitacion';
+    datos: any;
   }) {
     return this.http.post(this.backendUrl, data);
   }

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ModalRecordatorioComponent } from '../modal-recordatorio/modal-recordatorio.component';
+import { RegistroMedicamentoComponent } from '../registro-medicamento/registro-medicamento.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Firestore, collection, doc, addDoc, updateDoc } from '@angular/fire/firestore';
 import { IonicModule, ToastController } from '@ionic/angular';
@@ -82,7 +82,7 @@ export class ModalRmedicoComponent implements OnInit {
     // Si es nuevo registro y hay medicamentos, primero abrir modal de recordatorio
     if (data.medicamentos?.trim()) {
       const modal = await this.modalController.create({
-        component: ModalRecordatorioComponent,
+        component: RegistroMedicamentoComponent,
         componentProps: {
           medicamentoTexto: data.medicamentos,
           mascota: this.mascotaSeleccionada

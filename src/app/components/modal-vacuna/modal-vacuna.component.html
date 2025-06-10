@@ -2,58 +2,58 @@
   <ion-toolbar color="primary">
     <ion-title>{{ vacuna ? 'Editar Vacuna' : 'Nueva Vacuna' }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">Cerrar</ion-button>
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="vacunaForm" (ngSubmit)="guardarVacuna()">
+
+  <form [formGroup]="vacunaForm" (ngSubmit)="preguntarRecordatorio()">
 
     <ion-item>
-      <ion-label position="floating">Nombre de la vacuna</ion-label>
-      <ion-input formControlName="nombre"></ion-input>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input formControlName="nombre" type="text" required></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating">Dosis</ion-label>
-      <ion-input formControlName="dosis"></ion-input>
+      <ion-input formControlName="dosis" type="text" required></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Fecha de aplicación</ion-label>
+      <ion-label position="floating">Fecha de Aplicación</ion-label>
       <ion-datetime
         formControlName="fecha"
         presentation="date"
-        [max]="hoy">
+        placeholder="Seleccionar fecha"
+        required>
       </ion-datetime>
     </ion-item>
 
     <ion-item>
-      <ion-label>Frecuencia</ion-label>
-      <ion-select formControlName="frecuencia">
-        <ion-select-option *ngFor="let f of frecuencias" [value]="f.value">{{ f.label }}</ion-select-option>
+      <ion-label position="floating">Frecuencia</ion-label>
+      <ion-select formControlName="frecuencia" interface="popover">
+        <ion-select-option value="">Sin repetición</ion-select-option>
+        <ion-select-option value="1 mes">Cada 1 mes</ion-select-option>
+        <ion-select-option value="3 meses">Cada 3 meses</ion-select-option>
+        <ion-select-option value="6 meses">Cada 6 meses</ion-select-option>
+        <ion-select-option value="12 meses">Cada 12 meses</ion-select-option>
+        <ion-select-option value="personalizada">Personalizar</ion-select-option>
       </ion-select>
     </ion-item>
 
-    <ion-item>
-      <ion-label>Próxima dosis</ion-label>
-      <ion-datetime
-        formControlName="proximaDosis"
-        presentation="date"
-        [readonly]="true"
-        [disabled]="true">
-      </ion-datetime>
+    <!-- Campo adicional para frecuencia personalizada -->
+    <ion-item *ngIf="vacunaForm.value.frecuencia === 'personalizada'">
+      <ion-label position="floating">Frecuencia Personalizada</ion-label>
+      <ion-input formControlName="frecuenciaPersonalizada" type="text" placeholder="Ej: cada 10 días"></ion-input>
     </ion-item>
 
-    <ion-item lines="full">
-      <ion-label>¿Vacuna aplicada?</ion-label>
-      <ion-checkbox slot="end" formControlName="aplicada"></ion-checkbox>
-    </ion-item>
-
-    <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
-      {{ vacuna ? 'Actualizar' : 'Guardar' }} Vacuna
+    <ion-button expand="full" type="submit" class="ion-margin-top">
+      {{ vacuna ? 'Actualizar Vacuna' : 'Guardar Vacuna' }}
     </ion-button>
-    
   </form>
+
 </ion-content>
