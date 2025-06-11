@@ -1,13 +1,11 @@
-// recordatorios.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { AlertController } from '@ionic/angular';
+import { IonicModule, ModalController, AlertController } from '@ionic/angular';
+import { Observable } from 'rxjs';
 import { RecordatorioService } from 'src/app/services/recordatorio.service';
-import { Observable, forkJoin, of } from 'rxjs';
-import { map, mergeMap, switchMap } from 'rxjs/operators';
-import { Firestore, collection, collectionData, query, where, doc, getDoc, getDocs } from '@angular/fire/firestore';
+import { ModalRecordatorioComponent } from 'src/app/components/modal-recordatorio/modal-recordatorio.component';
+import { getAuth } from 'firebase/auth';
 
 @Component({
   selector: 'app-recordatorios',
@@ -17,73 +15,59 @@ import { Firestore, collection, collectionData, query, where, doc, getDoc, getDo
   imports: [CommonModule, IonicModule, FormsModule]
 })
 export class RecordatoriosPage implements OnInit {
-  usuarioLogin?: string;
-  uidUsuario?: string;
-  recordatorios: any[] = [];
-  cargando = true;
+  recordatorios$!: Observable<any[]>;
 
   constructor(
-    private firestore: Firestore,
     private recordatorioService: RecordatorioService,
+    private modalController: ModalController,
     private alertController: AlertController
   ) {}
 
-  async ngOnInit() {
-    const usuario = localStorage.getItem('usuarioLogin');
-    if (usuario) {
-      const usuarioParsed = JSON.parse(usuario);
-      this.usuarioLogin = usuarioParsed.nombre;
-      this.uidUsuario = usuarioParsed.uid;
-      await this.cargarRecordatorios();
+  ngOnInit() {
+    this.cargarRecordatorios();
+  }
+
+  cargarRecordatorios() {
+    const user = getAuth().currentUser;
+    if (user) {
+      this.recordatorios$ = this.recordatorioService.obtenerRecordatoriosPorUsuario(user.uid);
     }
   }
 
-  async cargarRecordatorios() {
-    try {
-      const mascotasSnapshot = await getDocs(
-        query(collection(this.firestore, 'mascotas'), where('uid', '==', this.uidUsuario))
-      );
+  async abrirModalRecordatorio(recordatorio?: any) {
+    const modal = await this.modalController.create({
+      component: ModalRecordatorioComponent,
+      componentProps: { recordatorio }
+    });
 
-      const midToNombre: Record<string, string> = {};
-      const mids = mascotasSnapshot.docs.map(doc => {
-        midToNombre[doc.id] = doc.data()['nombre'];
-        return doc.id;
-      });
+    modal.onDidDismiss().then(result => {
+      if (result.data) this.cargarRecordatorios();
+    });
 
-      const vacunasSnapshot = await getDocs(
-        query(collection(this.firestore, 'vacunasMascotas'), where('mid', 'in', mids))
-      );
-
-      const vidToMid: Record<string, string> = {};
-      vacunasSnapshot.docs.forEach(doc => {
-        vidToMid[doc.id] = doc.data()['mid'];
-      });
-
-      const recordatoriosSnapshot = await getDocs(
-        query(collection(this.firestore, 'recordatorios'))
-      );
-
-      this.recordatorios = recordatoriosSnapshot.docs
-        .map(doc => {
-          const data = doc.data();
-          const mid = vidToMid[data['vid']];
-          const nombreMascota = midToNombre[mid];
-          return {
-            ...data,
-            rid: doc.id,
-            nombreMascota
-          };
-        })
-        .filter(r => r.nombreMascota)
-        .sort((a, b) => a.nombreMascota.localeCompare(b.nombreMascota));
-    } catch (error) {
-      console.error('Error al cargar recordatorios:', error);
-    } finally {
-      this.cargando = false;
-    }
+    await modal.present();
   }
 
-  formatearFrecuencia(f: string): string {
-    return f.charAt(0).toUpperCase() + f.slice(1);
+  async eliminarRecordatorio(rid: string) {
+    const alert = await this.alertController.create({
+      header: 'Eliminar Recordatorio',
+      message: '¿Estás seguro de eliminar este recordatorio?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            await this.recordatorioService.eliminarRecordatorio(rid);
+            this.cargarRecordatorios();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  formatearFecha(fecha: string): string {
+    return new Date(fecha).toLocaleDateString();
   }
 }

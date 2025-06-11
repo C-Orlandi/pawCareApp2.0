@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, query, where, doc, getDoc } from '@angular/fire/firestore';
-import { Observable, from, forkJoin, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDoc, query, where, orderBy } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,41 +8,32 @@ import { map, switchMap } from 'rxjs/operators';
 export class RecordatorioService {
   constructor(private firestore: Firestore) {}
 
-  obtenerRecordatoriosPorMid(mid: string): Observable<any[]> {
+  // Si no existe, añade este método para filtrar por UID
+  obtenerRecordatoriosPorUsuario(uid: string): Observable<any[]> {
     const ref = collection(this.firestore, 'recordatorios');
-    const q = query(ref, where('tipo', 'in', ['vacuna', 'desparasitacion', 'medicamento']));
-    return collectionData(q, { idField: 'rid' }).pipe(
-      switchMap((recordatorios: any[]) => {
-        const filtrados$ = recordatorios.map(recordatorio =>
-          this.obtenerMascotaDesdeVid(recordatorio.vid).pipe(
-            map(nombreMascota => ({
-              ...recordatorio,
-              nombreMascota
-            }))
-          )
-        );
-        return forkJoin(filtrados$);
-      }),
-      map(recordatoriosConMascota =>
-        recordatoriosConMascota.filter(r => r.mid === mid)
-      )
-    );
+    const q = query(ref, where('uid', '==', uid), orderBy('creadoEn', 'desc'));
+    return collectionData(q, { idField: 'rid' });
   }
 
-  private obtenerMascotaDesdeVid(vid: string): Observable<string> {
-    const vacunaRef = doc(this.firestore, 'vacunasMascotas', vid);
-    return from(getDoc(vacunaRef)).pipe(
-      switchMap(snapshotVacuna => {
-        const dataVacuna: any = snapshotVacuna.data();
-        if (!dataVacuna || !dataVacuna.mid) return of('Desconocido');
-        const mascotaRef = doc(this.firestore, 'mascotas', dataVacuna.mid);
-        return from(getDoc(mascotaRef)).pipe(
-          map(snapshotMascota => {
-            const dataMascota: any = snapshotMascota.data();
-            return dataMascota?.nombre || 'Desconocido';
-          })
-        );
-      })
-    );
+  // Si quieres mantener este que ya tienes para mid, ok:
+  obtenerRecordatoriosPorMid(mid: string): Observable<any[]> {
+    const ref = collection(this.firestore, 'recordatorios');
+    const q = query(ref, where('mid', '==', mid), orderBy('creadoEn', 'desc'));
+    return collectionData(q, { idField: 'rid' });
+  }
+
+  async agregarRecordatorio(data: any): Promise<void> {
+    const docRef = await addDoc(collection(this.firestore, 'recordatorios'), data);
+    await updateDoc(doc(this.firestore, 'recordatorios', docRef.id), { rid: docRef.id });
+  }
+
+  async actualizarRecordatorio(rid: string, data: any): Promise<void> {
+    const ref = doc(this.firestore, 'recordatorios', rid);
+    await updateDoc(ref, data);
+  }
+
+  async eliminarRecordatorio(rid: string): Promise<void> {
+    await deleteDoc(doc(this.firestore, 'recordatorios', rid));
   }
 }
+ 

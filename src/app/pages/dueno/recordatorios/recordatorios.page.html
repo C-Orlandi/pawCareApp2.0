@@ -1,31 +1,35 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Historial de Recordatorios</ion-title>
+    <ion-title>Recordatorios</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModalRecordatorio()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ng-container *ngIf="!cargando; else cargandoTemplate">
-    <ion-list *ngIf="recordatorios.length > 0; else sinRecordatorios">
-      <ion-item *ngFor="let recordatorio of recordatorios">
-        <ion-label>
-          <h2>Tipo: {{ recordatorio.tipo }}</h2>
-          <p>Mascota: {{ recordatorio.nombreMascota }}</p>
-          <p>Nombre: {{ recordatorio.nombre }}</p>
-          <p>Frecuencia: {{ formatearFrecuencia(recordatorio.frecuencia) }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ng-container>
+  <ion-list *ngIf="recordatorios$ | async as recordatorios; else cargando">
+    <ion-item *ngFor="let rec of recordatorios" lines="inset" button (click)="abrirModalRecordatorio(rec)">
+      <ion-label>
+        <h2>{{ rec.nombre || 'Sin nombre' }}</h2>
+        <p>Tipo: {{ rec.tipo || 'N/A' }}</p>
+        <p>Frecuencia: {{ rec.frecuencia || 'N/A' }}</p>
+        <p>Fecha inicio: {{ formatearFecha(rec.creadoEn) }}</p>
+      </ion-label>
+      <ion-button fill="clear" color="danger" slot="end" (click)="eliminarRecordatorio(rec.rid); $event.stopPropagation()">
+        <ion-icon name="trash"></ion-icon>
+      </ion-button>
+    </ion-item>
 
-  <ng-template #cargandoTemplate>
+    <ion-item *ngIf="recordatorios.length === 0">
+      <ion-label text-center>No hay recordatorios registrados.</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #cargando>
     <ion-spinner name="crescent"></ion-spinner>
     <p class="ion-text-center">Cargando recordatorios...</p>
-  </ng-template>
-
-  <ng-template #sinRecordatorios>
-    <ion-item>
-      <ion-label>No hay recordatorios disponibles.</ion-label>
-    </ion-item>
   </ng-template>
 </ion-content>

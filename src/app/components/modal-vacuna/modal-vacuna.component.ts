@@ -1,3 +1,4 @@
+// modal-vacuna.component.ts
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
@@ -109,14 +110,16 @@ export class ModalVacunaComponent implements OnInit {
         await updateDoc(doc(this.firestore, 'vacunasMascotas', vacunaId), { vid: vacunaId });
       }
 
-      // Guardar recordatorio si fue creado
       if (this.recordatorioData) {
+        // Guardar recordatorio en colección principal
         const recordatorioPayload = {
           creadoEn: new Date(),
-          frecuencia: this.recordatorioData.frecuenciaMeses,
+          frecuencia: this.recordatorioData.frecuenciaTexto,
           hora: this.recordatorioData.hora || null,
+          fechaLimite: this.recordatorioData.fechaLimite || null,
           vid: vacunaId,
-          rid: '', // temporal, se setea después
+          mid: this.mid,
+          rid: '',
           tipo: 'vacuna'
         };
 
@@ -125,17 +128,34 @@ export class ModalVacunaComponent implements OnInit {
           rid: recordatorioRef.id
         });
 
+        // Crear relación en vacunasRecordatorios (sin fechaVacuna ni fechaRecordatorio)
+        const relacion = {
+          vrid: '',
+          vid: vacunaId,
+          rid: recordatorioRef.id,
+          mid: this.mid,
+          nombreVacuna: formData.nombre,
+          frecuencia: this.recordatorioData.frecuenciaTexto,
+          fechaLimite: this.recordatorioData.fechaLimite || null,
+          creadoEn: new Date()
+        };
+
+        const relacionRef = await addDoc(collection(this.firestore, 'vacunasRecordatorios'), relacion);
+        await updateDoc(doc(this.firestore, 'vacunasRecordatorios', relacionRef.id), {
+          vrid: relacionRef.id
+        });
+
         // Enviar correo
         this.emailService.enviarEmailRecordatorio({
           email: this.usuarioEmail,
           tipo: 'vacuna',
           datos: {
             vacuna: formData.nombre,
-            frecuencia: this.recordatorioData.frecuenciaMeses,
+            frecuencia: this.recordatorioData.frecuenciaTexto,
             hora: this.recordatorioData.hora || 'No especificada'
           }
         }).subscribe({
-          next: () => console.log('✅ Correo enviado exitosamente'),
+          next: () => console.log('📧 Correo enviado exitosamente'),
           error: (err) => console.error('❌ Error al enviar correo:', err)
         });
       }
@@ -147,6 +167,36 @@ export class ModalVacunaComponent implements OnInit {
       this.presentToast('Error al guardar la vacuna');
     }
   }
+
+  calcularProximaFecha(fechaAplicacion: string, frecuencia: string): string | null {
+    console.log('📅 Fecha de aplicación:', fechaAplicacion);
+    console.log('🔁 Frecuencia ingresada:', frecuencia);
+
+    const fecha = new Date(fechaAplicacion);
+    const partes = frecuencia.toLowerCase().split(' ');
+    const cantidad = parseInt(partes[0], 10);
+    const unidad = partes[1];
+
+    if (isNaN(cantidad)) {
+      if (frecuencia.toLowerCase() === 'hoy') {
+        return fecha.toISOString();
+      }
+      return null;
+    }
+
+    if (unidad.includes('mes')) {
+      fecha.setMonth(fecha.getMonth() + cantidad);
+    } else if (unidad.includes('día')) {
+      fecha.setDate(fecha.getDate() + cantidad);
+    } else {
+      return null;
+    }
+
+    const proxima = fecha.toISOString();
+    console.log('✅ Próxima fecha calculada:', proxima);
+    return proxima;
+  }
+
   cerrar() {
     this.modalCtrl.dismiss(false);
   }

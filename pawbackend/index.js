@@ -4,8 +4,6 @@ const multer = require('multer');
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
-const notiRoutes = require('./noti');
-const userRoutes = require('./users');
 
 require('dotenv').config();
 
@@ -28,6 +26,9 @@ if (!admin.apps.length) {
 }
 
 const bucket = admin.storage().bucket();
+
+const notiRoutes = require('./noti');
+const userRoutes = require('./users');
 
 // 📦 Rutas
 app.use('/api', notiRoutes);

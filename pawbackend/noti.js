@@ -15,23 +15,34 @@ router.post('/enviar-email-recordatorio', async (req, res) => {
   console.log('📦 Datos:', datos);
 
   let mensaje = '';
-  let botones = '';
 
   if (tipo === 'vacuna') {
-    mensaje = `Has creado un recordatorio para la vacuna: ${datos.vacuna}, dosis: ${datos.dosis}, fecha: ${datos.fecha}, frecuencia: cada ${datos.frecuencia} días.`;
-
-    const aplicarUrl = `${frontendBaseUrl}/confirmar-vacuna?vid=${vid}&estado=aplicada`;
-    const pendienteUrl = `${frontendBaseUrl}/confirmar-vacuna?vid=${vid}&estado=pendiente`;
-
-    botones = `
-      <p>¿Se aplicó la vacuna?</p>
-      <a href="${aplicarUrl}" style="padding:10px 20px;background-color:#4CAF50;color:white;text-decoration:none;margin-right:10px;">Sí</a>
-      <a href="${pendienteUrl}" style="padding:10px 20px;background-color:#f44336;color:white;text-decoration:none;">No</a>
+    mensaje = `
+      <h3>🐾 Nueva vacuna registrada para tu mascota</h3>
+      <p><strong>Mascota:</strong> ${datos.nombreMascota}</p>
+      <p><strong>Vacuna:</strong> ${datos.nombreVacuna}</p>
+      <p><strong>Fecha:</strong> ${new Date(datos.fecha).toLocaleString()}</p>
+      <p><strong>Estado:</strong> ${datos.estado}</p>
     `;
   } else if (tipo === 'medicamento') {
-    mensaje = `Has creado un recordatorio para el medicamento: ${datos.medicamento}, dosis: ${datos.dosis}, duración: ${datos.duracion} días, frecuencia: ${datos.frecuencia} veces al día, hora de inicio: ${datos.horaInicio}`;
+    mensaje = mensaje = `
+      <h3>💊 Nuevo medicamento registrado</h3>
+      <p><strong>Mascota:</strong> ${datos.nombreMascota}</p>
+      <p><strong>Medicamento:</strong> ${datos.nombreMedicamento}</p>
+      <p><strong>Dosis:</strong> ${datos.dosis}</p>
+      <p><strong>Duración:</strong> ${datos.duracion} días</p>
+      <p><strong>Frecuencia:</strong> Cada ${datos.frecuenciaHoras} horas</p>
+      <p><strong>Fecha inicio:</strong> ${new Date(datos.fecha).toLocaleString()}</p>
+      <p><strong>Estado:</strong> ${datos.estado}</p>
+    `;
   } else if (tipo === 'desparasitacion') {
-    mensaje = `Has creado un recordatorio para la desparasitación: ${datos.vacuna}, dosis: ${datos.dosis}, fecha: ${datos.fecha}, frecuencia: cada ${datos.frecuencia} días.`;
+    mensaje = mensaje = `
+      <h3>🦠 Nueva desparasitación registrada</h3>
+      <p><strong>Mascota:</strong> ${datos.nombreMascota}</p>
+      <p><strong>Tratamiento:</strong> ${datos.nombreDesparasitacion}</p>
+      <p><strong>Fecha:</strong> ${new Date(datos.fecha).toLocaleString()}</p>
+      <p><strong>Estado:</strong> ${datos.estado}</p>
+    `;
   } else {
     return res.status(400).send({ error: 'Tipo de recordatorio no válido' });
   }
@@ -51,7 +62,6 @@ router.post('/enviar-email-recordatorio', async (req, res) => {
     html: `
       <div>
         <p>${mensaje}</p>
-        ${botones}
       </div>
     `
   };
