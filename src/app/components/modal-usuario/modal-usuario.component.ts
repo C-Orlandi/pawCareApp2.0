@@ -22,6 +22,7 @@ export class ModalUsuarioComponent implements OnInit {
   nombre = '';
   email = '';
   pass = '';
+  contacto = '';
   tipo = 'dueno';
 
   constructor(
@@ -50,6 +51,7 @@ export class ModalUsuarioComponent implements OnInit {
           nombre: this.nombre,
           email: this.email,
           pass: this.pass,
+          contacto: this.contacto,
           tipo: this.tipo
         };
 
@@ -81,6 +83,7 @@ export class ModalUsuarioComponent implements OnInit {
           nombre: this.nombre,
           email: this.email,
           pass: this.pass,
+          contacto: this.contacto,
           tipo: this.tipo
         };
 

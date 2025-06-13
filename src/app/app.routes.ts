@@ -98,5 +98,9 @@ export const routes: Routes = [
   {
     path: 'carnet',
     loadComponent: () => import('./pages/mascota/carnet/carnet.page').then( m => m.CarnetPage)
+  },  {
+    path: 'perfil-usuario',
+    loadComponent: () => import('./pages/dueno/perfil-usuario/perfil-usuario.page').then( m => m.PerfilUsuarioPage)
   },
+
 ];
