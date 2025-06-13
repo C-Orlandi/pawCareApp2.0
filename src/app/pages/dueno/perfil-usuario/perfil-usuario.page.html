@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mi Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item>
+    <ion-label position="floating">Nombre</ion-label>
+    <ion-input [(ngModel)]="nombre" type="text"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Email</ion-label>
+    <ion-input [(ngModel)]="email" type="email"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Nuevo Password</ion-label>
+    <ion-input [(ngModel)]="password" type="password" placeholder="Deja vacío para no cambiar"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Contacto</ion-label>
+    <ion-input [(ngModel)]="contacto" type="tel"></ion-input>
+  </ion-item>
+
+  <!-- Otros campos que quieras mostrar -->
+
+  <ion-button expand="block" (click)="guardarCambios()">Guardar Cambios</ion-button>
+
+  <ion-button expand="block" color="danger" (click)="eliminarCuenta()">Eliminar Cuenta</ion-button>
+
+</ion-content>

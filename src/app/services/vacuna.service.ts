@@ -16,6 +16,14 @@ export class VacunaService {
     return collectionData(q, { idField: 'vid' });
   }
 
+  obtenerVacunasporEstadp(mid: string): Observable<any[]> {
+    const vacunasRef = collection(this.firestore, 'vacunasMascotas');
+    const q = query(vacunasRef,
+                    where('mid', '==', mid),
+                    where('estado', '==', 'aplicada'));
+    return collectionData(q, { idField: 'vid' });
+  }
+
   async agregarVacuna(data: any): Promise<void> {
     const docRef = await addDoc(collection(this.firestore, 'vacunasMascotas'), data);
     await updateDoc(doc(this.firestore, 'vacunasMascotas', docRef.id), { vid: docRef.id });

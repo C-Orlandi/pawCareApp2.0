@@ -33,7 +33,7 @@ export class VacunasPage implements OnInit {
   }
 
   cargarVacunas() {
-    this.vacunas$ = this.vacunaService.obtenerVacunas(this.mascotaSeleccionada.mid);
+    this.vacunas$ = this.vacunaService.obtenerVacunasporEstadp(this.mascotaSeleccionada.mid);
   }
 
   async abrirModalVacuna(vacuna?: any) {
@@ -69,7 +69,12 @@ export class VacunasPage implements OnInit {
     await alert.present();
   }
 
-  formatearFecha(fecha: string): string {
-    return new Date(fecha).toLocaleDateString();
-  }
+  formatearFechaHora(fechayhora: string): string {
+  if (!fechayhora) return 'N/A';
+  const dt = new Date(fechayhora);
+  const fecha = dt.toLocaleDateString('es-PE'); // o 'es-ES' según preferencia
+  const horas = dt.getHours().toString().padStart(2, '0');
+  const minutos = dt.getMinutes().toString().padStart(2, '0');
+  return `${fecha} ${horas}:${minutos}`;  // ej: 10/06/2025 1345
+}
 }

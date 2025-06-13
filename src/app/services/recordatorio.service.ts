@@ -9,10 +9,11 @@ export class RecordatorioService {
   constructor(private firestore: Firestore) {}
 
   // Si no existe, añade este método para filtrar por UID
-  obtenerRecordatoriosPorUsuario(uid: string): Observable<any[]> {
-    const ref = collection(this.firestore, 'recordatorios');
-    const q = query(ref, where('uid', '==', uid), orderBy('creadoEn', 'desc'));
-    return collectionData(q, { idField: 'rid' });
+  // recordatorios.service.ts
+  getRecordatoriosPorUsuario(uid: string): Observable<any[]> {
+    const recordatoriosRef = collection(this.firestore, 'recordatorios');
+    const q = query(recordatoriosRef, where('uid', '==', uid));
+    return collectionData(q, { idField: 'rid' }) as Observable<any[]>;
   }
 
   // Si quieres mantener este que ya tienes para mid, ok:

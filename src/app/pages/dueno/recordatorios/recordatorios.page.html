@@ -10,21 +10,36 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list *ngIf="recordatorios$ | async as recordatorios; else cargando">
+  <ion-list *ngIf="recordatorios; else cargando">
     <ion-item *ngFor="let rec of recordatorios" lines="inset" button (click)="abrirModalRecordatorio(rec)">
       <ion-label>
-        <h2>{{ rec.nombre || 'Sin nombre' }}</h2>
-        <p>Tipo: {{ rec.tipo || 'N/A' }}</p>
-        <p>Frecuencia: {{ rec.frecuencia || 'N/A' }}</p>
-        <p>Fecha inicio: {{ formatearFecha(rec.creadoEn) }}</p>
+        <h2>{{ rec.nombreMascota || 'Mascota desconocida' }}</h2>
+        <p>Tipo: {{ rec.tipo }}</p>
+
+        <!-- VACUNA Y DESPARASITACIÓN -->
+        <ng-container *ngIf="rec.tipo === 'vacuna' || rec.tipo === 'desparasitacion'">
+          <p>Nombre: {{ rec.nombre }}</p>
+          <p>Fecha: {{ formatearFechaHora(rec.horaInicio) }}</p>
+          <p [class.text-red]="rec.estado === 'pendiente'">Estado: {{ rec.estado }}</p>
+        </ng-container>
+
+        <!-- MEDICAMENTO -->
+        <ng-container *ngIf="rec.tipo === 'medicamento'">
+          <p>Medicamento: {{ rec.nombre }}</p>
+          <p>Fecha: {{ formatearFechaHora(rec.horaInicio) }}</p>
+          <p>Dosis: {{ rec.dosis }} x {{ rec.duracion }} días cada {{ rec.frecuenciaHoras }} horas</p>
+          <p [class.text-red]="rec.estado === 'activo'">Estado: {{ rec.estado }}</p>
+        </ng-container>
+
       </ion-label>
-      <ion-button fill="clear" color="danger" slot="end" (click)="eliminarRecordatorio(rec.rid); $event.stopPropagation()">
+
+      <ion-button fill="clear" color="danger" slot="end" (click)="eliminarRecordatorio(rec); $event.stopPropagation()">
         <ion-icon name="trash"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item *ngIf="recordatorios.length === 0">
-      <ion-label text-center>No hay recordatorios registrados.</ion-label>
+      <ion-label class="ion-text-center">No hay recordatorios registrados.</ion-label>
     </ion-item>
   </ion-list>
 

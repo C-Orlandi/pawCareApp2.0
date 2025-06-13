@@ -4,6 +4,7 @@ import { Firestore, collection, collectionData, doc, docData, setDoc, updateDoc,
 import { Observable } from 'rxjs';
 import { Usuario } from '../interfaces/usuario';
 import { AuthService } from './auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,9 @@ import { AuthService } from './auth.service';
 export class UsuariosService {
 
   private collectionName = 'usuarios';
+  private apiUrl = 'http://localhost:3000/api'; 
 
-  constructor(private firestore: Firestore, private authService: AuthService) {}
+  constructor(private firestore: Firestore, private authService: AuthService, private http: HttpClient) {}
 
   getUsuarios(): Observable<Usuario[]> {
     const usuariosRef = collection(this.firestore, this.collectionName);
@@ -53,4 +55,27 @@ export class UsuariosService {
       throw error;
     }
   }
-}
+
+  actualizarPerfil(data: {
+    uid: string,
+    email?: string,
+    password?: string,
+    nombre?: string,
+    contacto?: string
+  }): Observable<any> {
+    // Llamada PUT a /usuarios/perfil en backend
+    return this.http.put(`${this.apiUrl}/usuarios/perfil`, data);
+  }
+
+  eliminarUsuarioPerfil(uid: string): Promise<void> {
+      // Primero eliminar doc en Firestore
+      const usuariosDocRef = doc(this.firestore, `usuarios/${uid}`);
+      const duenosDocRef = doc(this.firestore, `duenos/${uid}`);
+
+      return Promise.all([
+        deleteDoc(usuariosDocRef),
+        deleteDoc(duenosDocRef),
+        this.http.delete(`${this.apiUrl}/usuarios/${uid}`).toPromise()
+      ]).then(() => {});
+    }
+  }

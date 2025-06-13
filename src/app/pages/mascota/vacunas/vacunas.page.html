@@ -14,10 +14,9 @@
     <ion-item *ngFor="let vacuna of vacunas" lines="inset" button (click)="abrirModalVacuna(vacuna)">
       <ion-label>
         <h2>{{ vacuna.nombre }}</h2>
-        <p>Dosis: {{ vacuna.dosis || 'N/A' }}</p>
-        <p>Fecha: {{ formatearFecha(vacuna.fecha) }}</p>
-        <p [ngStyle]="{ color: vacuna.aplicada ? 'green' : 'red' }">
-          Estado: {{ vacuna.aplicada ? 'Aplicada' : 'Pendiente' }}
+        <p>Fecha: {{ formatearFechaHora(vacuna.fechayhora) }}</p>
+        <p [ngStyle]="{ color: vacuna.estado === 'aplicada' ? 'green' : 'red' }">
+          Estado: {{ vacuna.estado }}
         </p>
       </ion-label>
       <ion-button fill="clear" color="danger" name="end" (click)="eliminarVacuna(vacuna.vid); $event.stopPropagation()">
