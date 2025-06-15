@@ -1,28 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { Observable } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule, ModalController } from '@ionic/angular';
+import { Observable } from 'rxjs';
 import { ControlpycService } from 'src/app/services/controlpyc.service';
 import { ModalControlpycComponent } from 'src/app/components/modal-controlpyc/modal-controlpyc.component';
+import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
 
 @Component({
   selector: 'app-controlpyc',
   templateUrl: './controlpyc.page.html',
   styleUrls: ['./controlpyc.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, ReactiveFormsModule]
+  imports: [CommonModule, IonicModule, FormsModule]
 })
 export class ControlpycPage implements OnInit {
 
   controles$!: Observable<any[]>;
+  controles: any[] = [];
   mascotaSeleccionada: any;
 
   constructor(
     private controlService: ControlpycService,
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private exportarpdf: ExportarpdfService
   ) {}
 
   ngOnInit() {
@@ -35,6 +37,10 @@ export class ControlpycPage implements OnInit {
 
   cargarControles() {
     this.controles$ = this.controlService.obtenerControles(this.mascotaSeleccionada.mid);
+
+    this.controles$.subscribe((data) => {
+      this.controles = data || [];
+    });
   }
 
   async abrirModalControl(control?: any) {
@@ -70,7 +76,16 @@ export class ControlpycPage implements OnInit {
     await alert.present();
   }
 
-  formatearFecha(fecha: string): string {
-    return new Date(fecha).toLocaleDateString();
+  formatearFechaHora(fechayhora: string): string {
+    if (!fechayhora) return 'N/A';
+    const dt = new Date(fechayhora);
+    const fecha = dt.toLocaleDateString('es-CL');
+    const horas = dt.getHours().toString().padStart(2, '0');
+    const minutos = dt.getMinutes().toString().padStart(2, '0');
+    return `${fecha} ${horas}:${minutos}`;
+  }
+
+  exportarPDF() {
+    this.exportarpdf.exportarControles(this.controles, this.mascotaSeleccionada?.nombre, this.formatearFechaHora);
   }
 }

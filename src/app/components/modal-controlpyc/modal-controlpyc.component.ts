@@ -26,12 +26,12 @@ export class ModalControlpycComponent  implements OnInit {
 
   ngOnInit() {
     this.formulario = this.fb.group({
-      fecha: [this.control?.fecha || new Date().toISOString(), Validators.required],
-      peso: [this.control?.peso || '', Validators.required],
-      unidad: [this.control?.unidad || 'kg', Validators.required],
-      condicionCorporal: [this.control?.condicionCorporal || ''],
-      actividadFisica: [this.control?.actividadFisica || ''],
-      observaciones: [this.control?.observaciones || '']
+      fecha: [new Date().toISOString(), Validators.required],
+      peso: ['', [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)]],
+      unidad: ['', Validators.required],
+      condicionCorporal: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/), Validators.minLength(3)]],
+      actividadFisica: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/), Validators.minLength(3)]],
+      observaciones: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/), Validators.minLength(3)]]
     });
 
     this.esEdicion = !!this.control;

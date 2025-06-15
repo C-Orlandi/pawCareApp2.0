@@ -1,27 +1,45 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
+import { AlertController, IonicModule } from '@ionic/angular';
+import { Geolocation } from '@capacitor/geolocation';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { IonicModule, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-geolocalizacion',
-  standalone: true,
-  imports: [CommonModule, IonicModule, FormsModule, GoogleMapsModule],
   templateUrl: './geolocalizacion.page.html',
   styleUrls: ['./geolocalizacion.page.scss'],
+  standalone: true,
+  imports: [CommonModule, IonicModule, FormsModule, GoogleMapsModule],
 })
 export class GeolocalizacionPage implements OnInit {
   userLat = 0;
   userLng = 0;
-  tipoVeterinaria: 'clinico' | 'zootecnista' | 'exotic' = 'clinico';
-
   zoom = 14;
   center: google.maps.LatLngLiteral = { lat: 0, lng: 0 };
-  markers: any[] = [];
 
-  constructor(private alertController: AlertController) {}
+  markers: any[] = [];
+  userMarker = {
+    position: { lat: 0, lng: 0 },
+    title: 'Tu ubicación',
+    options: {
+      icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+      clickable: false,
+      draggable: false,
+      optimized: false,
+    }
+  };
+
+  radio = 0;
+
+  circle: google.maps.Circle | null = null;
+
+  tipoVeterinaria: '' | 'todos' | 'domestico' | 'exotico' = '';
+
+  cargando = false;
+
+  constructor(private alertCtrl: AlertController, private http: HttpClient, private zone: NgZone) {}
 
   async ngOnInit() {
     await this.obtenerUbicacion();
@@ -33,9 +51,11 @@ export class GeolocalizacionPage implements OnInit {
       this.userLat = position.coords.latitude;
       this.userLng = position.coords.longitude;
       this.center = { lat: this.userLat, lng: this.userLng };
-      this.cargarVeterinarias();
+      this.userMarker.position = { lat: this.userLat, lng: this.userLng };
+
+      this.crearOActualizarCirculo();
     } catch (error) {
-      const alert = await this.alertController.create({
+      const alert = await this.alertCtrl.create({
         header: 'Permiso requerido',
         message: 'Debes permitir la ubicación para usar esta función.',
         buttons: ['OK'],
@@ -44,45 +64,163 @@ export class GeolocalizacionPage implements OnInit {
     }
   }
 
-  cargarVeterinarias() {
-    const veterinariasMock = [
-      {
-        nombre: 'Vet Clínica Central',
-        tipo: 'clinico',
-        lat: this.userLat + 0.004,
-        lng: this.userLng + 0.004,
-      },
-      {
-        nombre: 'Vet Zoo Amigos',
-        tipo: 'zootecnista',
-        lat: this.userLat - 0.003,
-        lng: this.userLng + 0.002,
-      },
-      {
-        nombre: 'Exotic Pet Care',
-        tipo: 'exotic',
-        lat: this.userLat - 0.005,
-        lng: this.userLng - 0.005,
-      },
-    ];
+  onRadioCambiar(event: any) {
+    this.zone.run(() => {
+      this.radio = event.detail.value;
+      this.crearOActualizarCirculo();
+      this.buscarVeterinarias();
+    });
+  }
 
-    this.markers = veterinariasMock
-      .filter(v => v.tipo === this.tipoVeterinaria)
-      .map(v => ({
-        position: { lat: v.lat, lng: v.lng },
-        title: v.nombre,
-        options: {
-          icon:
-            v.tipo === 'clinico'
-              ? 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-              : v.tipo === 'zootecnista'
-              ? 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
-              : 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-        },
-      }));
+  crearOActualizarCirculo() {
+    if (!this.userLat || !this.userLng) return;
+
+    const circleOptions: google.maps.CircleOptions = {
+      strokeColor: '#3880ff',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#3880ff',
+      fillOpacity: 0.15,
+      map: null,
+      center: { lat: this.userLat, lng: this.userLng },
+      radius: this.radio,
+      clickable: false,
+      editable: false,
+      visible: true,
+      zIndex: 1,
+    };
+
+    if (this.circle) {
+      this.circle.setCenter(circleOptions.center!);
+      this.circle.setRadius(this.radio);
+    } else {
+      this.circle = new google.maps.Circle(circleOptions);
+    }
   }
 
   onFiltroCambiar() {
-    this.cargarVeterinarias();
+    this.buscarVeterinarias();
+  }
+
+  buscarVeterinarias() {
+    if (!this.tipoVeterinaria) {
+      this.markers = [];
+      return;
+    }
+
+    this.cargando = true;
+    this.markers = [];
+
+    const url = 'http://localhost:3000/api/veterinarias';
+    const location = `${this.userLat},${this.userLng}`;
+    const radiusParam = '30000'; // fijo para evitar uso de radio manual
+
+    if (this.tipoVeterinaria === 'todos') {
+      const queryDomestico = 'veterinarias para mascotas domesticas';
+      const queryExotico = 'veterinarias exoticas';
+
+      Promise.all([
+        this.http.get<any>(url, {
+          params: { location, query: queryDomestico, radius: radiusParam }
+        }).toPromise(),
+        this.http.get<any>(url, {
+          params: { location, query: queryExotico, radius: radiusParam }
+        }).toPromise()
+      ]).then(results => {
+        let combinedResults: any[] = [];
+        results.forEach(r => {
+          if (r && r.results) {
+            combinedResults = combinedResults.concat(r.results);
+          }
+        });
+
+        console.log('✅ Veterinarias combinadas:', combinedResults);
+
+        const uniqueResults = combinedResults.filter((v, i, a) =>
+          a.findIndex(t => t.place_id === v.place_id) === i);
+
+        this.markers = uniqueResults
+          .slice(0, 100)
+          .map(place => {
+            const isExotica = place.name.toLowerCase().includes('exot') || place.types?.some((t: string) => t.includes('exot'));
+            return {
+              position: {
+                lat: place.geometry.location.lat,
+                lng: place.geometry.location.lng,
+              },
+              title: place.name,
+              placeId: place.place_id,
+              options: {
+                icon: isExotica
+                  ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+                  : 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+              },
+            };
+          });
+
+        console.log('✅ Marcadores:', this.markers);
+        this.cargando = false;
+      }).catch(async (error) => {
+        console.error('❌ Error al buscar veterinarias (todos):', error);
+        this.cargando = false;
+        const alert = await this.alertCtrl.create({
+          header: 'Error',
+          message: 'No se pudo cargar veterinarias desde el backend.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+      });
+
+    } else {
+      let query = this.tipoVeterinaria === 'domestico'
+        ? 'veterinarias para mascotas domesticas'
+        : 'veterinarias exoticas';
+
+      this.http.get<any>(url, {
+        params: { location, query, radius: radiusParam }
+      }).subscribe(async res => {
+        console.log(`✅ Resultados para ${this.tipoVeterinaria}:`, res.results);
+
+        this.markers = res.results
+          .slice(0, 100)
+          .map((place: any) => ({
+            position: {
+              lat: place.geometry.location.lat,
+              lng: place.geometry.location.lng,
+            },
+            title: place.name,
+            placeId: place.place_id,
+            options: {
+              icon: this.tipoVeterinaria === 'domestico'
+                ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            },
+          }));
+        console.log('✅ Marcadores cargados:', this.markers);
+        this.cargando = false;
+      }, async (error) => {
+        console.error('❌ Error al buscar veterinarias:', error);
+        this.cargando = false;
+        const alert = await this.alertCtrl.create({
+          header: 'Error',
+          message: 'No se pudo cargar veterinarias desde el backend.',
+          buttons: ['OK'],
+        });
+        await alert.present();
+      });
+    }
+  }
+
+  estaDentroDelRadio(lat: number, lng: number): boolean {
+    return true; // se desactiva el filtro por radio
+  }
+
+  deg2rad(deg: number): number {
+    return deg * (Math.PI / 180);
+  }
+
+  abrirGoogleMaps(placeId: string) {
+    const url = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+    window.open(url, '_blank');
   }
 }

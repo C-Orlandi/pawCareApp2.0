@@ -10,28 +10,33 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list *ngIf="desparasitaciones$ | async as desparasitaciones; else cargando">
-    <ion-item *ngFor="let des of desparasitaciones" lines="inset" button (click)="abrirModalDesparasitacion(des)">
+  <ion-list *ngIf="desparasitaciones.length > 0; else cargando">
+    <ion-item *ngFor="let desparasitacion of desparasitaciones" lines="inset" button (click)="abrirModalDesparasitacion(desparasitacion)">
       <ion-label>
-        <h2>{{ des.nombre }}</h2>
-        <p>Dosis: {{ des.dosis || 'N/A' }}</p>
-        <p>Fecha: {{ formatearFecha(des.fecha) }}</p>
-        <p [ngStyle]="{ color: des.aplicada ? 'green' : 'red' }">
-          Estado: {{ des.aplicada ? 'Aplicada' : 'Pendiente' }}
+        <h2>{{ desparasitacion.nombre }}</h2>
+        <p>Fecha: {{ formatearFechaHora(desparasitacion.fechayhora) }}</p>
+        <p [ngStyle]="{ color: desparasitacion.estado === 'aplicada' ? 'green' : 'red' }">
+          Estado: {{ desparasitacion.estado }}
         </p>
       </ion-label>
-      <ion-button fill="clear" color="danger" slot="end" (click)="eliminarDesparasitacion(des.did); $event.stopPropagation()">
+      <ion-button fill="clear" color="danger" name="end" (click)="eliminarDesparasitacion(desparasitacion.did); $event.stopPropagation()">
         <ion-icon name="trash"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item *ngIf="desparasitaciones.length === 0">
-      <ion-label text-center>No hay desparasitaciones registradas.</ion-label>
+      <ion-label text-center>No hay registros de desparasitación.</ion-label>
     </ion-item>
   </ion-list>
 
+  <ion-button expand="block" (click)="exportarPDF()">
+  Exportar PDF de Vacunas
+</ion-button>
+
   <ng-template #cargando>
-    <ion-spinner name="crescent"></ion-spinner>
-    <p class="ion-text-center">Cargando desparasitaciones...</p>
+    <div class="cargando-spinner">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p class="ion-text-center">Cargando desparasitaciones...</p>
+    </div>
   </ng-template>
 </ion-content>

@@ -6,6 +6,8 @@ import { Firestore, collection, addDoc, updateDoc, doc } from '@angular/fire/fir
 import { EmailService } from 'src/app/services/email.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-modal-vacuna',
@@ -86,7 +88,29 @@ export class ModalVacunaComponent implements OnInit {
     }
   }
 
+  exportarPDF() {
+  const dataElement = document.getElementById('historial-content'); // el div que contiene el historial
+
+  if (!dataElement) {
+    console.error('❌ No se encontró el contenedor del historial');
+    return;
+  }
+
+  html2canvas(dataElement).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('historial_pawcare.pdf');
+  });
+}
+
   cerrar() {
     this.modalCtrl.dismiss(false);
   }
+  
 }

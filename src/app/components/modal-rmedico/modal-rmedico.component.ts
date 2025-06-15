@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { RegistroMedicamentoComponent } from '../registro-medicamento/registro-medicamento.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Firestore, collection, doc, addDoc, updateDoc } from '@angular/fire/firestore';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { ModalControlpycComponent } from '../modal-controlpyc/modal-controlpyc.component';
 
 @Component({
   selector: 'app-modal-rmedico',
@@ -27,12 +27,11 @@ export class ModalRmedicoComponent implements OnInit {
   ) {
     this.registroForm = this.fb.group({
       fechaVisita: [this.hoy, Validators.required],
-      motivo: ['', Validators.required],
-      veterinario: [''],
-      diagnostico: [''],
-      tratamiento: [''],
-      medicamentos: [''],
-      notas: ['']
+      motivo: ['',[Validators.minLength(3), Validators.pattern('^[a-zA-ZÁÉÍÓÚáéíóúñÑ ]*$')]],
+      veterinario: ['',[Validators.minLength(3), Validators.pattern('^[a-zA-ZÁÉÍÓÚáéíóúñÑ ]*$')]],
+      diagnostico: ['', [Validators.required, Validators.minLength(3), Validators.pattern('^[a-zA-ZÁÉÍÓÚáéíóúñÑ ]*$')]],
+      tratamiento: ['', [Validators.minLength(3), Validators.pattern('^[a-zA-ZÁÉÍÓÚáéíóúñÑ0-9 ,.()\\n\\r-]*$')]],
+      medicamentos: ['',[Validators.required, Validators.minLength(3), Validators.pattern('^[a-zA-ZÁÉÍÓÚáéíóúñÑ0-9 ,.()\\n\\r-]*$')]],
     });
   }
 
@@ -77,27 +76,6 @@ export class ModalRmedicoComponent implements OnInit {
       }
 
       return;
-    }
-
-    // Si es nuevo registro y hay medicamentos, primero abrir modal de recordatorio
-    if (data.medicamentos?.trim()) {
-      const modal = await this.modalController.create({
-        component: RegistroMedicamentoComponent,
-        componentProps: {
-          medicamentoTexto: data.medicamentos,
-          mascota: this.mascotaSeleccionada
-        }
-      });
-
-      await modal.present();
-      const { role } = await modal.onDidDismiss();
-
-      if (role === 'cancel') {
-        const confirmacion = confirm(
-          'No se creó un recordatorio. ¿Deseas continuar y guardar el registro médico de todos modos?'
-        );
-        if (!confirmacion) return;
-      }
     }
 
     const registroData = {

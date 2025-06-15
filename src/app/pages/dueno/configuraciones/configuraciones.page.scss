@@ -1,0 +1,9 @@
+ion-header {
+  --background: #6f42c1 !important; /* tu morado */
+  --color: #ffffff !important; /* texto blanco */
+}
+
+body.dark ion-header {
+  --background: #6f42c1 !important; /* sigue morado en modo oscuro */
+  --color: #ffffff !important; 
+}

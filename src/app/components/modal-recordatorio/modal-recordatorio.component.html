@@ -51,7 +51,7 @@
       <p class="ion-padding-start">Solo se permiten letras y espacios.</p>
     </ion-text>
     <ion-text color="danger" *ngIf="form.get('nombre')?.hasError('minlength') && form.get('nombre')?.touched">
-      <p class="ion-padding-start">El nombre debe tener mínimo 3.</p>
+      <p class="ion-padding-start">El nombre debe tener mínimo 3 letras.</p>
     </ion-text>
 
     <ion-item>

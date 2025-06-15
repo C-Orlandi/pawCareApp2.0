@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { AlertController, IonicModule, ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
-import { ModalDesparasitacionComponent } from 'src/app/components/modal-desparasitacion/modal-desparasitacion.component';
 import { DesparasitacionService } from 'src/app/services/desparasitacion.service';
+import { ModalDesparasitacionComponent } from 'src/app/components/modal-desparasitacion/modal-desparasitacion.component';
+import jsPDF from 'jspdf';
+import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
 
 @Component({
   selector: 'app-desparasitacion',
@@ -15,13 +16,14 @@ import { DesparasitacionService } from 'src/app/services/desparasitacion.service
   imports: [CommonModule, IonicModule, FormsModule]
 })
 export class DesparasitacionPage implements OnInit {
-  desparasitaciones$!: Observable<any[]>;
+  desparasitaciones: any[] = [];
   mascotaSeleccionada: any;
 
   constructor(
     private desparasitacionService: DesparasitacionService,
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private exportarpdf: ExportarpdfService
   ) {}
 
   ngOnInit() {
@@ -33,8 +35,12 @@ export class DesparasitacionPage implements OnInit {
   }
 
   cargarDesparasitaciones() {
-    this.desparasitaciones$ = this.desparasitacionService.obtenerDesparasitaciones(this.mascotaSeleccionada.mid);
-  }
+  this.desparasitacionService.obtenerDesparasitacionesPorEstado(this.mascotaSeleccionada.mid)
+    .subscribe((data: any[]) => {
+      this.desparasitaciones = data || [];
+    });
+}
+
 
   async abrirModalDesparasitacion(desparasitacion?: any) {
     const modal = await this.modalController.create({
@@ -52,7 +58,7 @@ export class DesparasitacionPage implements OnInit {
   async eliminarDesparasitacion(did: string) {
     const alert = await this.alertController.create({
       header: 'Eliminar Desparasitación',
-      message: '¿Estás seguro de eliminar esta desparasitación?',
+      message: '¿Estás seguro de eliminar este registro?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -69,7 +75,16 @@ export class DesparasitacionPage implements OnInit {
     await alert.present();
   }
 
-  formatearFecha(fecha: string): string {
-    return new Date(fecha).toLocaleDateString();
+  formatearFechaHora(fechayhora: string): string {
+    if (!fechayhora) return 'N/A';
+    const dt = new Date(fechayhora);
+    const fecha = dt.toLocaleDateString('es-PE');
+    const horas = dt.getHours().toString().padStart(2, '0');
+    const minutos = dt.getMinutes().toString().padStart(2, '0');
+    return `${fecha} ${horas}:${minutos}`;
+  }
+
+  exportarPDF() {
+   this.exportarpdf.exportarDesparasitaciones(this.desparasitaciones, this.mascotaSeleccionada?.nombre, this.formatearFechaHora);
   }
 }

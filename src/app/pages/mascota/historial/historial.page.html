@@ -4,13 +4,15 @@
     <ion-buttons slot="end">
       <ion-button (click)="abrirModalRegistro()">
         <ion-icon name="add"></ion-icon>
+        <ion-button expand="block" color="medium" (click)="exportarPDF()">Exportar a PDF</ion-button>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list *ngIf="registros$ | async as registros; else cargando">
+<div id="historial-content">
+  <ion-list *ngIf="registros.length > 0; else cargando">
     <ion-item *ngFor="let registro of registros" lines="inset" button (click)="editarRegistro(registro)">
       <ion-label>
         <h2>{{ formatearFecha(registro.fechaVisita) }}</h2>
@@ -26,10 +28,15 @@
       </ion-button>
     </ion-item>
 
+ <ion-button expand="block" (click)="exportarPDF()">
+   Exportar PDF de Vacunas
+ </ion-button>
+
     <ion-item *ngIf="registros.length === 0">
       <ion-label text-center>No hay registros médicos.</ion-label>
     </ion-item>
   </ion-list>
+  </div>
 
     <ng-template #cargando>
     <div class="cargando-spinner">

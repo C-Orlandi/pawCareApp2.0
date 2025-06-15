@@ -25,6 +25,16 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
+ion-header {
+  --background: #6f42c1 !important; /* color morado fijo */
+  --color: #ffffff !important; /* texto blanco */
+}
+
+body.dark ion-header {
+  --background: #6f42c1 !important; /* morado también en modo oscuro */
+  --color: #ffffff !important;
+}
+
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------

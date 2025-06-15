@@ -1,5 +1,57 @@
-.map-container {
-  height: 400px;
-  width: 100%;
-  margin-bottom: 20px;
+.radio-slider-container {
+  --padding-start: 0;
+  --padding-end: 0;
+  --min-height: 60px;
+  
+  ion-label {
+    font-weight: 600;
+    font-size: 1rem;
+    width: 110px;
+  }
+
+  ion-range {
+    --bar-background-active: var(--ion-color-primary);
+    --bar-background: var(--ion-color-primary-tint);
+    --pin-background: var(--ion-color-primary);
+    --handle-background: var(--ion-color-primary);
+    --handle-box-shadow: 0 0 5px var(--ion-color-primary);
+    margin-left: 10px;
+    flex-grow: 1;
+  }
+}
+
+/* Google map borde redondeado y sombra sutil */
+google-map {
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  margin-top: 16px;
+  display: block;
+}
+
+/* ion-select estético, ancho completo */
+ion-select {
+  --min-width: 100%;
+  --padding-start: 10px;
+  --padding-end: 10px;
+}
+
+/* Ion item general para filtros con sombra y borde redondeado */
+ion-item {
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-bottom: 16px;
+  background: var(--ion-background-color);
+}
+
+.mensaje-vacio {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+  font-size: 1rem;
+}
+
+.spinner-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }

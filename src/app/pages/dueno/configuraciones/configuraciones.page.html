@@ -1,0 +1,24 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>configuraciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+  <!-- Modo oscuro -->
+  <ion-item>
+    <ion-label>Modo oscuro</ion-label>
+    <ion-toggle [(ngModel)]="modoOscuro" (ionChange)="toggleModoOscuro()"></ion-toggle>
+  </ion-item>
+
+  <!-- Idioma -->
+  <ion-item>
+      <ion-label>Idioma</ion-label>
+      <ion-select [(ngModel)]="idioma" (ionChange)="guardarIdioma()">
+        <ion-select-option value="es">Español</ion-select-option>
+        <ion-select-option value="en">English</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+</ion-content>

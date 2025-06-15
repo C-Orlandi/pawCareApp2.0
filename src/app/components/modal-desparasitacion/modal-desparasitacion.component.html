@@ -10,46 +10,37 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="desparasitacionForm" (ngSubmit)="preguntarRecordatorio()">
-
+  <form [formGroup]="desparasitacionForm" (ngSubmit)="guardarDesparasitacion()">
     <ion-item>
-      <ion-label position="floating">Nombre del antiparasitario</ion-label>
+      <ion-label position="floating">Nombre</ion-label>
       <ion-input formControlName="nombre" type="text" required></ion-input>
     </ion-item>
+     <ion-text color="danger" *ngIf="desparasitacionForm.get('nombre')?.touched && desparasitacionForm.get('nombre')?.invalid">
+      <p class="ion-padding-start" *ngIf="desparasitacionForm.get('nombre')?.errors?.['required']">
+        El nombre es obligatorio.
+      </p>
+      <p class="ion-padding-start" *ngIf="desparasitacionForm.get('nombre')?.errors?.['minlength']">
+        Debe tener al menos 3 letras.
+      </p>
+      <p class="ion-padding-start" *ngIf="desparasitacionForm.get('nombre')?.errors?.['pattern']">
+        Solo se permiten letras.
+      </p>
+    </ion-text>
 
     <ion-item>
-      <ion-label position="floating">Dosis</ion-label>
-      <ion-input formControlName="dosis" type="text"></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating">Fecha de aplicación</ion-label>
+      <ion-label position="floating">Fecha y Hora de Aplicación</ion-label>
       <ion-datetime
-        formControlName="fecha"
-        presentation="date"
-        placeholder="Seleccionar fecha"
+        formControlName="fechaHora"
+        presentation="date-time"
+        placeholder="Seleccionar fecha y hora"
         required>
       </ion-datetime>
     </ion-item>
+ <ion-text color="danger" *ngIf="desparasitacionForm.get('fechaHora')?.touched && desparasitacionForm.get('fechaHora')?.invalid">
+      <p class="ion-padding-start">Selecciona una fecha y hora válida.</p>
+    </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Frecuencia</ion-label>
-      <ion-select formControlName="frecuencia" interface="popover">
-        <ion-select-option value="">Sin repetición</ion-select-option>
-        <ion-select-option value="1 mes">Cada 1 mes</ion-select-option>
-        <ion-select-option value="3 meses">Cada 3 meses</ion-select-option>
-        <ion-select-option value="6 meses">Cada 6 meses</ion-select-option>
-        <ion-select-option value="12 meses">Cada 12 meses</ion-select-option>
-        <ion-select-option value="personalizada">Personalizar</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item *ngIf="desparasitacionForm.value.frecuencia === 'personalizada'">
-      <ion-label position="floating">Frecuencia Personalizada</ion-label>
-      <ion-input formControlName="frecuenciaPersonalizada" type="text" placeholder="Ej: cada 10 días"></ion-input>
-    </ion-item>
-
-    <ion-button expand="full" type="submit" class="ion-margin-top">
+    <ion-button expand="full" type="submit" class="ion-margin-top" [disabled]="desparasitacionForm.invalid">
       {{ desparasitacion ? 'Actualizar' : 'Guardar' }}
     </ion-button>
   </form>

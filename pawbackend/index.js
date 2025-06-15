@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 require('dotenv').config();
+console.log('API Key:', process.env.GOOGLE_MAPS_API_KEY);
 
 const app = express();
 
@@ -27,10 +28,13 @@ if (!admin.apps.length) {
 
 const bucket = admin.storage().bucket();
 
+const mapsRoutes = require('./maps');
 const notiRoutes = require('./noti');
 const userRoutes = require('./users');
 
 // 📦 Rutas
+
+app.use('/api', mapsRoutes);
 app.use('/api', notiRoutes);
 app.use('/api', userRoutes);
 

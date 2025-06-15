@@ -6,6 +6,9 @@ import { collectionData, Firestore } from '@angular/fire/firestore';
 import { ModalRmedicoComponent } from 'src/app/components/modal-rmedico/modal-rmedico.component';
 import { Observable } from 'rxjs';
 import { AlertController } from '@ionic/angular/standalone';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
 
 @Component({
   selector: 'app-historial',
@@ -15,13 +18,14 @@ import { AlertController } from '@ionic/angular/standalone';
   imports: [CommonModule, IonicModule],
 })
 export class HistorialPage implements OnInit {
-  registros$!: Observable<any[]>;
+  registros: any[] = [];
   mascotaSeleccionada: any;
-
+  
   constructor(
     private firestore: Firestore,
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private expotarpdf: ExportarpdfService
   ) {}
 
   ngOnInit() {
@@ -33,14 +37,17 @@ export class HistorialPage implements OnInit {
   }
 
   cargarRegistros() {
-    const ref = collection(this.firestore, 'registrosMedicos');
-    const q = query(
-      ref,
-      where('mid', '==', this.mascotaSeleccionada?.mid),
-      orderBy('fechaVisita', 'desc')
-    );
-    this.registros$ = collectionData(q, { idField: 'rid' });
-  }
+  const ref = collection(this.firestore, 'registrosMedicos');
+  const q = query(
+    ref,
+    where('mid', '==', this.mascotaSeleccionada?.mid),
+    orderBy('fechaVisita', 'desc')
+  );
+
+  collectionData(q, { idField: 'rid' }).subscribe(data => {
+    this.registros = data;
+  });
+ }
 
   async abrirModalRegistro() {
     const modal = await this.modalController.create({
@@ -91,7 +98,13 @@ export class HistorialPage implements OnInit {
     await alert.present();
   }
 
+  exportarPDF() {
+  this.expotarpdf.exportarHistorialMedico(this.registros, this.mascotaSeleccionada?.nombre, this.formatearFecha);
+}
+
   formatearFecha(fecha: string): string {
     return new Date(fecha).toLocaleDateString();
   }
+
+  
 }

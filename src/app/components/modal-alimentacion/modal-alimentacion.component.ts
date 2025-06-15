@@ -27,15 +27,15 @@ export class ModalAlimentacionComponent  implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController
   ) {
+
     this.alimentacionForm = this.fb.group({
       fecha: [this.hoy, Validators.required],
       tipoAlimento: ['', Validators.required],
-      nombreAlimento: ['', Validators.required],
-      cantidad: ['', Validators.required],
+      nombreAlimento: ['', [Validators.required, Validators.minLength(3), Validators.pattern('^[a-zA-ZÁÉÍÓÚáéíóúñÑ ]+$')]],
+      cantidad: ['', [Validators.required, Validators.pattern('^[0-9]+([.,][0-9]+)?\\s?(g|kg)?$')]],
       metodo: ['', Validators.required],
       comio: ['true', Validators.required],
-      obsDigestivas: [''],
-      obsAdicionales: ['']
+      obsAdicionales: ['', Validators.minLength(3)]
     });
   }
 

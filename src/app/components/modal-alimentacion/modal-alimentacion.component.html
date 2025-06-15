@@ -10,42 +10,97 @@
 <ion-content class="ion-padding">
   <form [formGroup]="alimentacionForm" (ngSubmit)="guardarAlimentacion()">
 
-    <ion-item>
-      <ion-label position="floating">Fecha</ion-label>
-      <ion-datetime formControlName="fecha" presentation="date" [max]="hoy"></ion-datetime>
-    </ion-item>
+  <ion-item>
+  <ion-label>
+    Fecha y hora <ion-text color="danger">*</ion-text>
+  </ion-label>
+  <ion-datetime-button datetime="datetime" slot="end"></ion-datetime-button>
+</ion-item>
+
+<ion-modal [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime
+      id="datetime"
+      formControlName="fecha"
+      presentation="date-time"
+      [value]="alimentacionForm.get('fecha')?.value"
+      [max]="hoy"
+      [showDefaultButtons]="true"
+      [formatOptions]="{
+        date: {
+          weekday: 'short',
+          month: 'long',
+          day: '2-digit'
+        },
+        time: {
+          hour: '2-digit',
+          minute: '2-digit'
+        }
+      }"
+    ></ion-datetime>
+   </ng-template>
+  </ion-modal>
+
+    <ion-text color="danger" *ngIf="alimentacionForm.get('fecha')?.hasError('required') && alimentacionForm.get('fecha')?.touched">
+      <p class="ion-padding-start">La fecha es obligatoria.</p>
+    </ion-text>
 
     <ion-item>
-      <ion-label>Tipo de alimento</ion-label>
-      <ion-select formControlName="tipoAlimento">
+      <ion-label>
+        Tipo de alimento <ion-text color="danger">*</ion-text>
+      </ion-label>
+      <ion-select formControlName="tipoAlimento" placeholder="Seleccionar...">
         <ion-select-option value="Fruta">Fruta</ion-select-option>
         <ion-select-option value="Insectos">Insectos</ion-select-option>
         <ion-select-option value="Verdura">Verdura</ion-select-option>
         <ion-select-option value="Otro">Otro</ion-select-option>
       </ion-select>
     </ion-item>
+    <ion-text color="danger" *ngIf="alimentacionForm.get('tipoAlimento')?.hasError('required') && alimentacionForm.get('tipoAlimento')?.touched">
+      <p class="ion-padding-start">El tipo de alimento es obligatorio.</p>
+    </ion-text>
 
     <ion-item>
-      <ion-label position="floating">Nombre del alimento</ion-label>
+      <ion-label position="floating">
+        Nombre del alimento <ion-text color="danger">*</ion-text>
+      </ion-label>
       <ion-input formControlName="nombreAlimento"></ion-input>
     </ion-item>
+    <ion-text color="danger" *ngIf="alimentacionForm.get('nombreAlimento')?.touched">
+      <p class="ion-padding-start" *ngIf="alimentacionForm.get('nombreAlimento')?.hasError('required')">Este campo es obligatorio.</p>
+      <p class="ion-padding-start" *ngIf="alimentacionForm.get('nombreAlimento')?.hasError('pattern')">Solo letras y espacios permitidos.</p>
+      <p class="ion-padding-start" *ngIf="alimentacionForm.get('nombreAlimento')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
+    </ion-text>
 
     <ion-item>
-      <ion-label position="floating">Cantidad ofrecida</ion-label>
+      <ion-label position="floating">
+        Cantidad ofrecida (ej: 100g, 0.5kg) <ion-text color="danger">*</ion-text>
+      </ion-label>
       <ion-input formControlName="cantidad" type="text"></ion-input>
     </ion-item>
+    <ion-text color="danger" *ngIf="alimentacionForm.get('cantidad')?.touched">
+      <p class="ion-padding-start" *ngIf="alimentacionForm.get('cantidad')?.hasError('required')">La cantidad es obligatoria.</p>
+      <p class="ion-padding-start" *ngIf="alimentacionForm.get('cantidad')?.hasError('pattern')">Solo números, decimales y unidades (g, kg).</p>
+    </ion-text>
 
     <ion-item>
-      <ion-label>Método</ion-label>
-      <ion-select formControlName="metodo">
+      <ion-label>
+        Método <ion-text color="danger">*</ion-text>
+      </ion-label>
+      <ion-select formControlName="metodo" placeholder="Seleccionar...">
         <ion-select-option value="Manual">Manual</ion-select-option>
         <ion-select-option value="Automática">Automática</ion-select-option>
         <ion-select-option value="Forzada">Forzada</ion-select-option>
       </ion-select>
     </ion-item>
+    <ion-text color="danger" *ngIf="alimentacionForm.get('metodo')?.hasError('required') && alimentacionForm.get('metodo')?.touched">
+      <p class="ion-padding-start">El método es obligatorio.</p>
+    </ion-text>
 
     <ion-item>
-      <ion-label>¿Comió?</ion-label>
+      <ion-label>
+        ¿Comió? <ion-text color="danger">*</ion-text>
+      </ion-label>
       <ion-radio-group formControlName="comio">
         <ion-item>
           <ion-label>Sí</ion-label>
@@ -57,19 +112,21 @@
         </ion-item>
       </ion-radio-group>
     </ion-item>
+    <ion-text color="danger" *ngIf="alimentacionForm.get('comio')?.hasError('required') && alimentacionForm.get('comio')?.touched">
+      <p class="ion-padding-start">Este campo es obligatorio.</p>
+    </ion-text>
 
     <ion-item>
-      <ion-label position="floating">Observaciones digestivas</ion-label>
-      <ion-textarea formControlName="obsDigestivas"></ion-textarea>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating">Observaciones adicionales</ion-label>
+      <ion-label position="floating">Observaciones <ion-text color="danger">*</ion-text></ion-label>
       <ion-textarea formControlName="obsAdicionales"></ion-textarea>
     </ion-item>
+    <ion-text color="danger" *ngIf="alimentacionForm.get('obsAdicionales')?.touched && alimentacionForm.get('obsAdicionales')?.value">
+      <p class="ion-padding-start" *ngIf="alimentacionForm.get('obsAdicionales')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
+    </ion-text>
 
     <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
       {{ alimentacion ? 'Actualizar' : 'Guardar' }} Registro
     </ion-button>
+
   </form>
 </ion-content>

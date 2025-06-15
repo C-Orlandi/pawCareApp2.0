@@ -5,30 +5,49 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-segment [(ngModel)]="tipoVeterinaria" (ionChange)="onFiltroCambiar()">
-    <ion-segment-button value="clinico">Clínico</ion-segment-button>
-    <ion-segment-button value="zootecnista">Zootecnista</ion-segment-button>
-    <ion-segment-button value="exotic">Exótica</ion-segment-button>
-  </ion-segment>
 
+  <!-- Filtros en select -->
+  <ion-item>
+    <ion-label>Filtro veterinaria</ion-label>
+    <ion-select [(ngModel)]="tipoVeterinaria" (ionChange)="onFiltroCambiar()" placeholder="Selecciona un filtro...">
+      <ion-select-option value="">Seleccionar</ion-select-option>
+      <ion-select-option value="todos">Todos</ion-select-option>
+      <ion-select-option value="domestico">Doméstico</ion-select-option>
+      <ion-select-option value="exotico">Exótico</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Spinner mientras carga -->
+  <ion-spinner *ngIf="cargando" name="crescent" class="spinner-center"></ion-spinner>
+
+  <!-- Mensaje si no hay resultados -->
+  <div *ngIf="!cargando && markers.length === 0" class="mensaje-vacio">
+    No se encontraron veterinarias dentro del radio seleccionado.
+  </div>
+
+  <!-- Google Map con tamaño fijo y borde redondeado -->
   <google-map
     height="400px"
     width="100%"
     [center]="center"
     [zoom]="zoom"
-  >
+    (mapReady)="crearOActualizarCirculo()"
+    #map>
+    
+    <!-- Marcador usuario -->
     <map-marker
-      *ngFor="let marker of markers"
+      [position]="userMarker.position"
+      [title]="userMarker.title"
+      [options]="userMarker.options">
+    </map-marker>
+
+    <!-- Marcadores veterinarias -->
+    <map-marker *ngFor="let marker of markers"
       [position]="marker.position"
       [title]="marker.title"
       [options]="marker.options"
-    ></map-marker>
-
-    <!-- Marcador de ubicación del usuario -->
-    <map-marker
-      [position]="center"
-      title="Tu ubicación"
-      [options]="{ icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }"
-    ></map-marker>
+      (mapClick)="abrirGoogleMaps(marker.placeId)">
+    </map-marker>
   </google-map>
+
 </ion-content>

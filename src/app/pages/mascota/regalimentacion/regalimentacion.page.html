@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Alimentación</ion-title>
+    <ion-title>Historial de Alimentación</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="abrirModalAlimentacion()">
         <ion-icon name="add"></ion-icon>
@@ -10,28 +10,33 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list *ngIf="alimentaciones$ | async as alimentaciones; else cargando">
+
+  <ion-list *ngIf="alimentaciones.length > 0; else cargando">
     <ion-item *ngFor="let item of alimentaciones" lines="inset" button (click)="abrirModalAlimentacion(item)">
       <ion-label>
         <h2>{{ item.tipoAlimento }} - {{ item.nombreAlimento }}</h2>
-        <p>Cantidad: {{ item.cantidad }}</p>
-        <p>Hora: {{ item.hora }}</p>
-        <p>¿Comió?: {{ item.comio ? 'Sí' : 'No' }}</p>
+        <p><strong>Fecha y Hora:</strong> {{ item.horaFormateada }}</p>
+        <p><strong>Cantidad:</strong> {{ item.cantidad }}</p>
+        <p><strong>Método:</strong> {{ item.metodo }}</p>
+        <p><strong>¿Comió?:</strong> {{ item.comio ? 'Sí' : 'No' }}</p>
+        <p><strong>Observaciones adicionales:</strong> {{ item.obsAdicionales || 'Ninguna' }}</p>
       </ion-label>
-      <ion-button fill="clear" color="danger" name="end" (click)="eliminarAlimentacion(item.aid); $event.stopPropagation()">
+      <ion-button fill="clear" color="danger" slot="end" (click)="eliminarAlimentacion(item.aid); $event.stopPropagation()">
         <ion-icon name="trash"></ion-icon>
       </ion-button>
     </ion-item>
-
-    <ion-item *ngIf="alimentaciones.length === 0">
-      <ion-label text-center>No hay registros de alimentación.</ion-label>
-    </ion-item>
   </ion-list>
 
+  <ion-button expand="block" (click)="exportarPDF()" class="ion-margin">
+    <ion-icon name="download-outline" slot="start"></ion-icon>
+    Exportar historial PDF
+  </ion-button>
+
   <ng-template #cargando>
-  <div class="cargando-spinner">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p class="ion-text-center">Cargando alimentación...</p>
-  </div>
+    <div class="cargando-spinner">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p class="ion-text-center">Cargando historial de alimentación...</p>
+    </div>
   </ng-template>
+
 </ion-content>
