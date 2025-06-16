@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar color="tertiary">
     <ion-title>Veterinarias Cercanas</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -11,18 +11,25 @@
     <ion-label>Filtro veterinaria</ion-label>
     <ion-select [(ngModel)]="tipoVeterinaria" (ionChange)="onFiltroCambiar()" placeholder="Selecciona un filtro...">
       <ion-select-option value="">Seleccionar</ion-select-option>
-      <ion-select-option value="todos">Todos</ion-select-option>
       <ion-select-option value="domestico">Doméstico</ion-select-option>
       <ion-select-option value="exotico">Exótico</ion-select-option>
     </ion-select>
   </ion-item>
 
   <!-- Spinner mientras carga -->
-  <ion-spinner *ngIf="cargando" name="crescent" class="spinner-center"></ion-spinner>
+  <div *ngIf="cargando" class="spinner-center">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando veterinarias...</p>
+  </div>
 
   <!-- Mensaje si no hay resultados -->
   <div *ngIf="!cargando && markers.length === 0" class="mensaje-vacio">
-    No se encontraron veterinarias dentro del radio seleccionado.
+    No se encontraron veterinarias con el filtro seleccionado.
+  </div>
+
+  <!-- Mensaje si hay resultados -->
+  <div *ngIf="!cargando && markers.length > 0" class="mensaje-encontrados">
+    {{ markers.length }} resultado{{ markers.length > 1 ? 's' : '' }} encontrado{{ markers.length > 1 ? 's' : '' }}.
   </div>
 
   <!-- Google Map con tamaño fijo y borde redondeado -->

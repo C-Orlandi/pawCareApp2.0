@@ -1,37 +1,55 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="tertiary">
     <ion-title>Desparasitación</ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="exportarPDF()">
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Exportar PDF
+      </ion-button>
       <ion-button (click)="abrirModalDesparasitacion()">
-        <ion-icon name="add"></ion-icon>
+        <ion-icon name="add" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list *ngIf="desparasitaciones.length > 0; else cargando">
-    <ion-item *ngFor="let desparasitacion of desparasitaciones" lines="inset" button (click)="abrirModalDesparasitacion(desparasitacion)">
+  <ion-list *ngIf="desparasitaciones$ | async as desparasitaciones; else cargando">
+    <ion-item
+      *ngFor="let desparasitacion of desparasitaciones"
+      lines="inset"
+      button
+      (click)="abrirModalDesparasitacion(desparasitacion)"
+      class="vacuna-item"
+    >
       <ion-label>
-        <h2>{{ desparasitacion.nombre }}</h2>
-        <p>Fecha: {{ formatearFechaHora(desparasitacion.fechayhora) }}</p>
-        <p [ngStyle]="{ color: desparasitacion.estado === 'aplicada' ? 'green' : 'red' }">
-          Estado: {{ desparasitacion.estado }}
+        <h2 class="titulo">{{ desparasitacion.nombre }}</h2>
+        <p>📅 {{ formatearFechaHora(desparasitacion.fechayhora) }}</p>
+        <p>
+          Estado:
+          <strong [ngClass]="{
+            'estado-aplicada': desparasitacion.estado === 'aplicada',
+            'estado-pendiente': desparasitacion.estado !== 'aplicada'
+          }">
+            {{ desparasitacion.estado | titlecase }}
+          </strong>
         </p>
       </ion-label>
-      <ion-button fill="clear" color="danger" name="end" (click)="eliminarDesparasitacion(desparasitacion.did); $event.stopPropagation()">
+
+      <ion-button
+        fill="clear"
+        color="danger"
+        slot="end"
+        (click)="eliminarDesparasitacion(desparasitacion.did); $event.stopPropagation()"
+      >
         <ion-icon name="trash"></ion-icon>
       </ion-button>
     </ion-item>
 
     <ion-item *ngIf="desparasitaciones.length === 0">
-      <ion-label text-center>No hay registros de desparasitación.</ion-label>
+      <ion-label class="ion-text-center">No hay registros de desparasitación.</ion-label>
     </ion-item>
   </ion-list>
-
-  <ion-button expand="block" (click)="exportarPDF()">
-  Exportar PDF de Vacunas
-</ion-button>
 
   <ng-template #cargando>
     <div class="cargando-spinner">

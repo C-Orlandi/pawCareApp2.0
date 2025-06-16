@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="tertiary">
     <ion-title>{{ recordatorioEdit ? 'Editar Recordatorio' : 'Nuevo Recordatorio' }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="cancelar()">Cerrar</ion-button>
@@ -8,68 +8,65 @@
 </ion-header>
 
 <ion-content class="ion-padding" [fullscreen]="true">
-  <form [formGroup]="form">
-    <ion-item>
-      <ion-select formControlName="tipo" interface="alert" placeholder="Selecciona una categoría">
-        <ion-select-option value="vacuna">Vacuna</ion-select-option>
-        <ion-select-option value="desparasitacion">Desparasitación</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-text color="danger" *ngIf="form.get('tipo')?.hasError('required') && form.get('tipo')?.touched">
-      <p class="ion-padding-start">El tipo es obligatorio.</p>
-    </ion-text>
+  <ion-card>
+    <ion-card-content>
+      <form [formGroup]="form">
 
-    <ion-item lines="full">
-      <ion-label position="stacked">
-        Selecciona Mascota <ion-text color="danger">*</ion-text>
-      </ion-label>
-      <ion-select
-        formControlName="mid"
-        placeholder="Selecciona una mascota"
-        interface="alert"
-      >
-        <ion-select-option
-          *ngFor="let mascota of mascotas"
-          [value]="mascota.mid"
-        >
-          {{ mascota.nombre }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-text color="danger" *ngIf="form.get('mid')?.hasError('required') && form.get('mid')?.touched">
-      <p class="ion-padding-start">La mascota es obligatoria.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="stacked">Tipo <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select formControlName="tipo" interface="alert" placeholder="Selecciona una categoría">
+            <ion-select-option value="vacuna">Vacuna</ion-select-option>
+            <ion-select-option value="desparasitacion">Desparasitación</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text color="danger" *ngIf="form.get('tipo')?.hasError('required') && form.get('tipo')?.touched">
+          <p class="ion-padding-start">El tipo es obligatorio.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Nombre <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input type="text" formControlName="nombre"></ion-input>
-    </ion-item>
-    <ion-text color="danger" *ngIf="form.get('nombre')?.hasError('required') && form.get('nombre')?.touched">
-      <p class="ion-padding-start">El nombre es obligatorio.</p>
-    </ion-text>
-    <ion-text color="danger" *ngIf="form.get('nombre')?.hasError('pattern') && form.get('nombre')?.touched">
-      <p class="ion-padding-start">Solo se permiten letras y espacios.</p>
-    </ion-text>
-    <ion-text color="danger" *ngIf="form.get('nombre')?.hasError('minlength') && form.get('nombre')?.touched">
-      <p class="ion-padding-start">El nombre debe tener mínimo 3 letras.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="stacked">Selecciona Mascota <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select formControlName="mid" interface="alert" placeholder="Selecciona una mascota">
+            <ion-select-option *ngFor="let mascota of mascotas" [value]="mascota.mid">
+              {{ mascota.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text color="danger" *ngIf="form.get('mid')?.hasError('required') && form.get('mid')?.touched">
+          <p class="ion-padding-start">La mascota es obligatoria.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Fecha y hora <ion-text color="danger">*</ion-text></ion-label>
-      <ion-datetime formControlName="fechaHora" presentation="date-time"></ion-datetime>
-    </ion-item>
-    <ion-text color="danger" *ngIf="form.get('fechaHora')?.hasError('required') && form.get('fechaHora')?.touched">
-      <p class="ion-padding-start">La fecha y hora son obligatorias.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="stacked">Nombre <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input type="text" formControlName="nombre"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="form.get('nombre')?.hasError('required') && form.get('nombre')?.touched">
+          <p class="ion-padding-start">El nombre es obligatorio.</p>
+        </ion-text>
+        <ion-text color="danger" *ngIf="form.get('nombre')?.hasError('pattern') && form.get('nombre')?.touched">
+          <p class="ion-padding-start">Solo se permiten letras y espacios.</p>
+        </ion-text>
+        <ion-text color="danger" *ngIf="form.get('nombre')?.hasError('minlength') && form.get('nombre')?.touched">
+          <p class="ion-padding-start">El nombre debe tener mínimo 3 letras.</p>
+        </ion-text>
 
-    <ion-item *ngIf="mostrarCheckboxAplicada">
-  <ion-label>¿Aplicada?</ion-label>
-  <ion-checkbox slot="start" formControlName="estadoAplicada"></ion-checkbox>
-</ion-item>
+        <ion-item lines="inset">
+          <ion-label position="stacked">Fecha y hora <ion-text color="danger">*</ion-text></ion-label>
+          <ion-datetime formControlName="fechaHora" presentation="date-time"></ion-datetime>
+        </ion-item>
+        <ion-text color="danger" *ngIf="form.get('fechaHora')?.hasError('required') && form.get('fechaHora')?.touched">
+          <p class="ion-padding-start">La fecha y hora son obligatorias.</p>
+        </ion-text>
 
+        <ion-item lines="inset" *ngIf="mostrarCheckboxAplicada">
+          <ion-label position="stacked">¿Aplicada?</ion-label>
+          <ion-checkbox slot="start" formControlName="estadoAplicada"></ion-checkbox>
+        </ion-item>
 
-    <ion-button expand="block" class="ion-margin-top" (click)="guardar()">
-      {{ recordatorioEdit ? 'Guardar Cambios' : 'Guardar' }}
-    </ion-button>
-  </form>
+        <ion-button expand="block" shape="round" size="large" class="ion-margin-top" (click)="guardar()" color="dark">
+          {{ recordatorioEdit ? 'Guardar Cambios' : 'Guardar' }}
+        </ion-button>
+
+      </form>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

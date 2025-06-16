@@ -56,10 +56,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin/adminhome/adminhome.page').then( m => m.AdminhomePage)
   },
   {
-    path: 'gestionar-dueno',
-    loadComponent: () => import('./pages/admin/gestionar-dueno/gestionar-dueno.page').then( m => m.GestionarDuenoPage)
-  },
-  {
     path: 'gestionar-usuario',
     loadComponent: () => import('./pages/admin/gestionar-usuario/gestionar-usuario.page').then( m => m.GestionarUsuarioPage)
   },
@@ -98,7 +94,8 @@ export const routes: Routes = [
   {
     path: 'carnet',
     loadComponent: () => import('./pages/mascota/carnet/carnet.page').then( m => m.CarnetPage)
-  },  {
+  },
+  {
     path: 'perfil-usuario',
     loadComponent: () => import('./pages/dueno/perfil-usuario/perfil-usuario.page').then( m => m.PerfilUsuarioPage)
   },

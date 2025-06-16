@@ -4,6 +4,8 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { Firestore, collection, addDoc, updateDoc, doc } from '@angular/fire/firestore';
 import { EmailService } from 'src/app/services/email.service';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
+import { LoadingController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-modal-desparasitacion',
@@ -24,7 +26,8 @@ export class ModalDesparasitacionComponent implements OnInit {
     private firestore: Firestore,
     private toastController: ToastController,
     private modalCtrl: ModalController,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {
@@ -59,7 +62,22 @@ export class ModalDesparasitacionComponent implements OnInit {
   }
 
   async guardarDesparasitacion() {
-    if (this.desparasitacionForm.invalid || !this.mid) return;
+    if (this.desparasitacionForm.invalid || !this.mid) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario inválido',
+        text: 'Por favor completa todos los campos correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Guardando...',
+      spinner: 'circles'
+    });
+    await loading.present();
 
     const formValue = this.desparasitacionForm.value;
     const formData = {
@@ -83,13 +101,30 @@ export class ModalDesparasitacionComponent implements OnInit {
         await updateDoc(doc(this.firestore, 'desparasitacionesMascotas', idDesp), { id_desp: idDesp });
       }
 
-      this.presentToast('Desparasitación guardada correctamente');
-      this.modalCtrl.dismiss(true);
+      await loading.dismiss();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Registro Exitoso',
+        text: 'La desparasitación fue guardada correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      }).then(() => {
+        this.modalCtrl.dismiss(true);
+      });
     } catch (error) {
-      this.presentToast('Error al guardar la desparasitación');
+      await loading.dismiss();
       console.error('Error al guardar la desparasitación:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al guardar la desparasitación.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
     }
   }
+
 
   cerrar() {
     this.modalCtrl.dismiss(false);

@@ -107,8 +107,8 @@ export class ModalUsuarioComponent implements OnInit {
     }
   }
 
-  cancelar() {
-    this.modalCtrl.dismiss();
+  cerrar() {
+    this.modalCtrl.dismiss(false);
   }
 
   generarPasswordAleatoria(longitud: number = 10) {

@@ -10,6 +10,8 @@ import {
 } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { ModalRecordatorioComponent } from 'src/app/components/modal-recordatorio/modal-recordatorio.component';
+import Swal from 'sweetalert2';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-recordatorios',
@@ -29,7 +31,8 @@ export class RecordatoriosPage implements OnInit {
     private authService: AuthService,
     private alertCtrl: AlertController,
     private loadingCtrl: LoadingController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private http: HttpClient  
   ) {}
 
   ngOnInit() {
@@ -122,13 +125,17 @@ export class RecordatoriosPage implements OnInit {
   }
 
   async procesarEliminacion(recordatorio: any) {
-    const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
+    const rid = recordatorio.rid;
+    const tipo = recordatorio.tipo;
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Eliminando...',
+      spinner: 'circles',
+    });
+
     await loading.present();
 
     try {
-      const rid = recordatorio.rid;
-      const tipo = recordatorio.tipo;
-
       await deleteDoc(doc(this.firestore, 'recordatorios', rid));
 
       if (tipo === 'vacuna') {
@@ -139,13 +146,35 @@ export class RecordatoriosPage implements OnInit {
         await this.borrarColeccionPorRid('medicamentosRecordatorios', rid);
       } else if (tipo === 'desparasitacion') {
         await this.borrarColeccionPorRid('desparasitacionesMascotas', rid);
-        await this.borrarColeccionPorRid('desparasitacionRecordatorio', rid);
+        await this.borrarColeccionPorRid('desparasitacionRecordatorios', rid);
       }
 
+      await loading.dismiss();
+
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Eliminado!',
+        text: 'El recordatorio ha sido eliminado correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
+
+      // Aquí llamas a la función para enviar correo
+      this.enviarCorreoEliminacion(recordatorio);
+
+      this.cargarRecordatorios();
+
     } catch (error) {
-      console.error('Error al eliminar recordatorio:', error);
-    } finally {
-      loading.dismiss();
+      console.error('❌ Error al eliminar recordatorio:', error);
+      await loading.dismiss();
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo eliminar el recordatorio.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
     }
   }
 
@@ -169,4 +198,29 @@ export class RecordatoriosPage implements OnInit {
 
   return `${dia}/${mes}/${anio} ${hora}:${minutos}`;
 }
+
+private async enviarCorreoEliminacion(recordatorio: any) {
+  // Aquí armas la info que quieres enviar
+  const payload = {
+    email: 'correo@usuario.com', // reemplaza por email real o dinámico si lo tienes
+    asunto: 'Recordatorio eliminado',
+    cuerpo: `
+      Se ha eliminado el siguiente recordatorio:
+      Tipo: ${recordatorio.tipo}
+      Mascota: ${recordatorio.nombreMascota || 'Desconocida'}
+      Fecha: ${this.formatearFechaHora(recordatorio.fecha)}
+      Estado: ${recordatorio.estado}
+      Detalles adicionales: ${JSON.stringify(recordatorio)}
+    `
+  };
+
+  try {
+    // Cambia esta URL a la de tu backend que envía correos
+    await this.http.post('https://tu-backend.com/api/enviar-correo', payload).toPromise();
+
+  } catch (error) {
+    console.error('Error enviando correo eliminación:', error);
+  }
+}
+
 }

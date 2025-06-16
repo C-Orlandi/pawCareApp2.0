@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, LoadingController, ModalController } from '@ionic/angular';
 import { ToastController } from '@ionic/angular/standalone';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-modal-alimentacion',
@@ -25,7 +26,8 @@ export class ModalAlimentacionComponent  implements OnInit {
     private fb: FormBuilder,
     private firestore: Firestore,
     private modalController: ModalController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private loadingController: LoadingController
   ) {
 
     this.alimentacionForm = this.fb.group({
@@ -46,7 +48,23 @@ export class ModalAlimentacionComponent  implements OnInit {
   }
 
   async guardarAlimentacion() {
-    if (this.alimentacionForm.invalid) return;
+    if (this.alimentacionForm.invalid) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario inválido',
+        text: 'Por favor completa todos los campos correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+      spinner: 'crescent',
+      backdropDismiss: false
+    });
+    await loading.present();
 
     const data = {
       ...this.alimentacionForm.value,
@@ -58,19 +76,37 @@ export class ModalAlimentacionComponent  implements OnInit {
     try {
       if (this.alimentacion?.aid) {
         await updateDoc(doc(this.firestore, 'alimentacionMascotas', this.alimentacion.aid), data);
-        this.presentToast('Registro actualizado');
       } else {
         const docRef = await addDoc(collection(this.firestore, 'alimentacionMascotas'), data);
         await updateDoc(doc(this.firestore, 'alimentacionMascotas', docRef.id), { aid: docRef.id });
-        this.presentToast('Registro guardado');
       }
 
-      this.modalController.dismiss(true);
-    } catch (error) {
-      console.error('Error al guardar registro de alimentación:', error);
-      this.presentToast('Error al guardar el registro');
+      await loading.dismiss();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Registro exitoso',
+        text: 'Registro de alimentación guardado correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      }).then(() => {
+        this.modalController.dismiss(true);
+      });
+
+    } catch (error: any) {
+      console.error('🔥 Error al guardar registro:', error);
+      await loading.dismiss();
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al guardar el registro. Inténtalo nuevamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
     }
   }
+
 
   cerrar() {
     this.modalController.dismiss(false);

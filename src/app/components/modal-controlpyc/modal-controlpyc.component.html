@@ -1,98 +1,82 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="tertiary">
     <ion-title>{{ esEdicion ? 'Editar' : 'Nuevo' }} Registro</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrarModal()">
-        <ion-icon name="close"></ion-icon>
-      </ion-button>
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="formulario" (ngSubmit)="guardar()">
-    <ion-item>
-      <ion-label position="stacked">Fecha y hora <ion-text color="danger">*</ion-text></ion-label>
-      <ion-datetime-button datetime="datetime"></ion-datetime-button>
-    </ion-item>
-    <ion-modal [keepContentsMounted]="true">
-      <ng-template>
-        <ion-datetime
-          id="datetime"
-          formControlName="fecha"
-          presentation="date-time"
-          [value]="formulario.get('fecha')?.value"
-          [showDefaultButtons]="true"
-          [formatOptions]="{
-            date: {
-              weekday: 'short',
-              month: 'long',
-              day: '2-digit'
-            },
-            time: {
-              hour: '2-digit',
-              minute: '2-digit'
-            }
-          }"
-        ></ion-datetime>
-      </ng-template>
-    </ion-modal>
-    <ion-text color="danger" *ngIf="formulario.get('fecha')?.hasError('required') && formulario.get('fecha')?.touched">
-      <p class="ion-padding-start">La fecha es obligatoria.</p>
-    </ion-text>
 
-    <ion-item>
-      <ion-label position="stacked">Peso <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input type="number" formControlName="peso"></ion-input>
-    </ion-item>
-    <ion-text color="danger" *ngIf="formulario.get('peso')?.touched">
-      <p class="ion-padding-start" *ngIf="formulario.get('peso')?.hasError('required')">El peso es obligatorio.</p>
-      <p class="ion-padding-start" *ngIf="formulario.get('peso')?.hasError('pattern')">Debe ser un número válido.</p>
-    </ion-text>
+  <ion-card>
+    <ion-card-content>
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
 
-    <ion-item>
-      <ion-label position="stacked">Unidad <ion-text color="danger">*</ion-text></ion-label>
-      <ion-select formControlName="unidad" placeholder="Seleccionar...">
-        <ion-select-option value="kg">kg</ion-select-option>
-        <ion-select-option value="g">g</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-text color="danger" *ngIf="formulario.get('unidad')?.hasError('required') && formulario.get('unidad')?.touched">
-      <p class="ion-padding-start">La unidad es obligatoria.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Fecha <ion-text color="danger">*</ion-text></ion-label>
+          <ion-datetime formControlName="fecha" presentation="date"></ion-datetime>
+        </ion-item>
+        <ion-text color="danger" *ngIf="formulario.get('fecha')?.hasError('required') && formulario.get('fecha')?.touched">
+          <p class="ion-padding-start">La fecha es obligatoria.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="stacked">Condición Corporal <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input formControlName="condicionCorporal"></ion-input>
-    </ion-item>
-    <ion-text color="danger" *ngIf="formulario.get('condicionCorporal')?.touched">
-      <p class="ion-padding-start" *ngIf="formulario.get('condicionCorporal')?.hasError('required')">Este campo es obligatorio.</p>
-      <p class="ion-padding-start" *ngIf="formulario.get('condicionCorporal')?.hasError('pattern')">Solo letras y espacios permitidos.</p>
-      <p class="ion-padding-start" *ngIf="formulario.get('condicionCorporal')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Peso <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input type="number" formControlName="peso"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="formulario.get('peso')?.touched">
+          <p class="ion-padding-start" *ngIf="formulario.get('peso')?.hasError('required')">El peso es obligatorio.</p>
+          <p class="ion-padding-start" *ngIf="formulario.get('peso')?.hasError('pattern')">Debe ser un número válido.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="stacked">Actividad Física <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input formControlName="actividadFisica"></ion-input>
-    </ion-item>
-    <ion-text color="danger" *ngIf="formulario.get('actividadFisica')?.touched">
-      <p class="ion-padding-start" *ngIf="formulario.get('actividadFisica')?.hasError('required')">Este campo es obligatorio.</p>
-      <p class="ion-padding-start" *ngIf="formulario.get('actividadFisica')?.hasError('pattern')">Solo letras y espacios permitidos.</p>
-      <p class="ion-padding-start" *ngIf="formulario.get('actividadFisica')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label>Unidad <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select formControlName="unidad" placeholder="Seleccionar...">
+            <ion-select-option value="kg">kg</ion-select-option>
+            <ion-select-option value="g">g</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text color="danger" *ngIf="formulario.get('unidad')?.hasError('required') && formulario.get('unidad')?.touched">
+          <p class="ion-padding-start">La unidad es obligatoria.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="stacked">Observaciones <ion-text color="danger">*</ion-text></ion-label>
-      <ion-textarea formControlName="observaciones"></ion-textarea>
-    </ion-item>
-    <ion-text color="danger" *ngIf="formulario.get('observaciones')?.touched">
-      <p class="ion-padding-start" *ngIf="formulario.get('observaciones')?.hasError('required')">Este campo es obligatorio.</p>
-      <p class="ion-padding-start" *ngIf="formulario.get('observaciones')?.hasError('pattern')">Solo letras y espacios permitidos.</p>
-      <p class="ion-padding-start" *ngIf="formulario.get('observaciones')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Condición Corporal <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="condicionCorporal"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="formulario.get('condicionCorporal')?.touched">
+          <p class="ion-padding-start" *ngIf="formulario.get('condicionCorporal')?.hasError('required')">Este campo es obligatorio.</p>
+          <p class="ion-padding-start" *ngIf="formulario.get('condicionCorporal')?.hasError('pattern')">Solo letras y espacios permitidos.</p>
+          <p class="ion-padding-start" *ngIf="formulario.get('condicionCorporal')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
+        </ion-text>
 
-    <ion-button expand="full" type="submit" [disabled]="formulario.invalid">
-      {{ esEdicion ? 'Actualizar' : 'Guardar' }}
-    </ion-button>
-  </form>
+        <ion-item lines="inset">
+          <ion-label position="floating">Actividad Física <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="actividadFisica"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="formulario.get('actividadFisica')?.touched">
+          <p class="ion-padding-start" *ngIf="formulario.get('actividadFisica')?.hasError('required')">Este campo es obligatorio.</p>
+          <p class="ion-padding-start" *ngIf="formulario.get('actividadFisica')?.hasError('pattern')">Solo letras y espacios permitidos.</p>
+          <p class="ion-padding-start" *ngIf="formulario.get('actividadFisica')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
+        </ion-text>
+
+        <ion-item lines="inset">
+          <ion-label position="floating">Observaciones <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea formControlName="observaciones"></ion-textarea>
+        </ion-item>
+        <ion-text color="danger" *ngIf="formulario.get('observaciones')?.touched">
+          <p class="ion-padding-start" *ngIf="formulario.get('observaciones')?.hasError('required')">Este campo es obligatorio.</p>
+          <p class="ion-padding-start" *ngIf="formulario.get('observaciones')?.hasError('pattern')">Solo letras y espacios permitidos.</p>
+          <p class="ion-padding-start" *ngIf="formulario.get('observaciones')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
+        </ion-text>
+
+        <ion-button expand="block" shape="round" size="large" class="ion-margin-top" type="submit" [disabled]="formulario.invalid" color="dark">
+          {{ esEdicion ? 'Actualizar' : 'Guardar' }} Registro
+        </ion-button>
+
+      </form>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>

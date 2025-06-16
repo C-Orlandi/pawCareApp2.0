@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {IonicModule, MenuController, ActionSheetController, ToastController} from '@ionic/angular';
+import {IonicModule, MenuController, ActionSheetController, ToastController, NavController} from '@ionic/angular';
 import { Router } from '@angular/router';
 import {Firestore, collection, getDocs, query, where} from '@angular/fire/firestore';
 import { MascotaService } from 'src/app/services/mascota.service'; 
@@ -22,7 +22,8 @@ export class MisMascotasPage {
     private menuController: MenuController,
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController,
-    private mascotaService: MascotaService
+    private mascotaService: MascotaService,
+    private navCtrl: NavController
   ) {}
 
   ionViewWillEnter() {
@@ -122,4 +123,14 @@ export class MisMascotasPage {
     });
     await toast.present();
   }
+  
+  goTo(seccion: string) {
+    this.router.navigate(['/' + seccion]);
+  }
+
+  goBack() {
+    this.router.navigate(['/userhome']);  // o cualquier ruta que quieras
+  }
+
 }
+

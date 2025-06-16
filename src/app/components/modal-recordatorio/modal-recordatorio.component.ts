@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { EmailService } from 'src/app/services/email.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-modal-recordatorio',
@@ -84,11 +85,25 @@ export class ModalRecordatorioComponent implements OnInit {
 
   async guardar() {
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      alert('Completa todos los campos requeridos.');
-      return;
-    }
+    this.form.markAllAsTouched();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Formulario inválido',
+      text: 'Por favor completa todos los campos correctamente.',
+      confirmButtonText: 'OK',
+      heightAuto: false
+    });
+    return;
+  }
 
+  const loading = await this.loadingCtrl.create({ 
+    message: 'Guardando...',
+    spinner: 'crescent',
+    backdropDismiss: false
+  });
+
+  await loading.present();
+  try {
     if (this.recordatorioEdit?.rid) {
       const formData = this.form.value;
       const rid = this.recordatorioEdit?.rid;
@@ -106,7 +121,15 @@ export class ModalRecordatorioComponent implements OnInit {
       };
 
       await this.actualizarRecordatorioYEstado(recordatorioActualizado);
-      this.modalCtrl.dismiss(true);
+      await loading.dismiss();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Actualizado correctamente',
+        text: 'El recordatorio fue editado con éxito.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      }).then(() => this.modalCtrl.dismiss(true));
       return;
     }
 
@@ -121,8 +144,6 @@ export class ModalRecordatorioComponent implements OnInit {
     const creadoEn = new Date().toISOString();
     const { nombre, fechaHora } = this.form.value;
 
-    const hora = new Date(fechaHora).toISOString().split('T')[1].substring(0, 5);
-
     const recordatorioData: any = {
       uid: this.usuarioUid,
       mid,
@@ -132,85 +153,132 @@ export class ModalRecordatorioComponent implements OnInit {
       creadoEn
     };
 
-    try {
-      const docRef = await addDoc(collection(this.firestore, 'recordatorios'), recordatorioData);
-      const rid = docRef.id;
-      await updateDoc(doc(this.firestore, 'recordatorios', rid), { rid });
+    const docRef = await addDoc(collection(this.firestore, 'recordatorios'), recordatorioData);
+    const rid = docRef.id;
+    await updateDoc(doc(this.firestore, 'recordatorios', rid), { rid });
 
-      if (tipoSeleccionado === 'vacuna') {
-        const vacuna = await addDoc(collection(this.firestore, 'vacunasMascotas'), {
-          uid: this.usuarioUid, mid, rid, nombre, fecha: fechaHora, estado: 'pendiente', creadoEn
-        });
-        const vid = vacuna.id;
-        await updateDoc(doc(this.firestore, 'vacunasMascotas', vid), { vid });
-        await addDoc(collection(this.firestore, 'vacunasRecordatorios'), {
-          vrid: `${vid}_${rid}`, vid, rid
-        });
+    if (tipoSeleccionado === 'vacuna') {
+      const vacuna = await addDoc(collection(this.firestore, 'vacunasMascotas'), {
+        uid: this.usuarioUid, mid, rid, nombre, fecha: fechaHora, estado: 'pendiente', creadoEn
+      });
+      const vid = vacuna.id;
+      await updateDoc(doc(this.firestore, 'vacunasMascotas', vid), { vid });
+      await addDoc(collection(this.firestore, 'vacunasRecordatorios'), {
+        vrid: `${vid}_${rid}`, vid, rid
+      });
 
-        await this.emailService.enviarEmailRecordatorio({
-          email: usuarioParsed.email,
-          tipo: 'vacuna',
-          datos: {
-            nombreMascota,
-            nombreVacuna: nombre,
-            fecha: fechaHora,
-            estado: 'pendiente'
-          }
-        }).toPromise();
+      await this.emailService.enviarEmailRecordatorio({
+        email: usuarioParsed.email,
+        tipo: 'vacuna',
+        datos: {
+          nombreMascota,
+          nombreVacuna: nombre,
+          fecha: fechaHora,
+          estado: 'pendiente'
+        }
+      }).toPromise();
 
-      } else if (tipoSeleccionado === 'desparasitacion') {
-        const desp = await addDoc(collection(this.firestore, 'desparasitacionesMascotas'), {
-          uid: this.usuarioUid, mid, rid, nombre, fecha: fechaHora, estado: 'pendiente', creadoEn
-        });
-        const id_desp = desp.id;
-        await updateDoc(doc(this.firestore, 'desparasitacionesMascotas', id_desp), { id_desp });
-        await addDoc(collection(this.firestore, 'desparasitacionRecordatorios'), {
-          drid: `${id_desp}_${rid}`, id_desp, rid
-        });
+    } else if (tipoSeleccionado === 'desparasitacion') {
+      const desp = await addDoc(collection(this.firestore, 'desparasitacionesMascotas'), {
+        uid: this.usuarioUid, mid, rid, nombre, fecha: fechaHora, estado: 'pendiente', creadoEn
+      });
+      const id_desp = desp.id;
+      await updateDoc(doc(this.firestore, 'desparasitacionesMascotas', id_desp), { id_desp });
+      await addDoc(collection(this.firestore, 'desparasitacionRecordatorios'), {
+        drid: `${id_desp}_${rid}`, id_desp, rid
+      });
 
-        await this.emailService.enviarEmailRecordatorio({
-          email: usuarioParsed.email,
-          tipo: 'desparasitacion',
-          datos: {
-            nombreMascota,
-            nombreDesparasitacion: nombre,
-            fecha: fechaHora,
-            estado: 'pendiente'
-          }
-        }).toPromise();
-      }
-
-      this.modalCtrl.dismiss(true);
-    } catch (error) {
-      console.error('Error guardando recordatorio:', error);
+      await this.emailService.enviarEmailRecordatorio({
+        email: usuarioParsed.email,
+        tipo: 'desparasitacion',
+        datos: {
+          nombreMascota,
+          nombreDesparasitacion: nombre,
+          fecha: fechaHora,
+          estado: 'pendiente'
+        }
+      }).toPromise();
     }
+
+    await loading.dismiss();
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Registro Exitoso',
+      text: 'El recordatorio fue guardado correctamente.',
+      confirmButtonText: 'OK',
+      heightAuto: false
+    }).then(() => this.modalCtrl.dismiss(true));
+
+  } catch (error) {
+    console.error('Error guardando recordatorio:', error);
+    await loading.dismiss();
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error al guardar',
+      text: 'Ocurrió un error al guardar el recordatorio. Intenta nuevamente.',
+      confirmButtonText: 'OK',
+      heightAuto: false
+    });
   }
+}
 
   private async actualizarRecordatorioYEstado(recordatorioActualizado: any) {
-    const loading = await this.loadingCtrl.create({ message: 'Actualizando...' });
-    await loading.present();
+  const loading = await this.loadingCtrl.create({ message: 'Actualizando...' });
+  await loading.present();
 
-    try {
-      let { rid, tipo, fecha, estado, ...otrosCampos } = recordatorioActualizado;
+  try {
+    let { rid, tipo, fecha, estado, nombre, mid, ...otrosCampos } = recordatorioActualizado;
 
-      if (!estado) {
-        estado = this.determinarEstadoPorTipo(tipo);
-      }
-
-      const docRefRecordatorio = doc(this.firestore, 'recordatorios', rid);
-      await updateDoc(docRefRecordatorio, { fecha, ...otrosCampos });
-
-      if (tipo === 'vacuna') {
-        await this.actualizarEstadoPorRid('vacunasMascotas', rid, { fecha, estado, ...otrosCampos });
-      } else if (tipo === 'desparasitacion') {
-        await this.actualizarEstadoPorRid('desparasitacionesMascotas', rid, { fecha, estado, ...otrosCampos });
-      }
-    } catch (error) {
-      console.error('Error al actualizar recordatorio:', error);
-    } finally {
-      loading.dismiss();
+    if (!estado) {
+      estado = this.determinarEstadoPorTipo(tipo);
     }
+
+    const docRefRecordatorio = doc(this.firestore, 'recordatorios', rid);
+    await updateDoc(docRefRecordatorio, { fecha, nombre, mid, ...otrosCampos });
+
+    if (tipo === 'vacuna') {
+      await this.actualizarEstadoPorRid('vacunasMascotas', rid, { fecha, estado, nombre, ...otrosCampos });
+    } else if (tipo === 'desparasitacion') {
+      await this.actualizarEstadoPorRid('desparasitacionesMascotas', rid, { fecha, estado, nombre, ...otrosCampos });
+    }
+
+    // --- Aquí envías el correo al editar ---
+    // Para el correo necesitas datos adicionales, como email y nombre mascota:
+    const usuario = localStorage.getItem('usuarioLogin');
+    const usuarioParsed = usuario ? JSON.parse(usuario) : null;
+
+    // Busca la mascota para obtener su nombre
+    const mascotaSeleccionada = this.mascotas.find(m => m.mid === mid);
+    const nombreMascota = mascotaSeleccionada?.nombre || 'Desconocido';
+
+    // Prepara datos para enviar el correo según tipo
+    const emailPayload: any = {
+      email: usuarioParsed?.email,
+      tipo,
+      datos: {
+        nombreMascota,
+        fecha,
+        estado,
+      }
+    };
+
+    if (tipo === 'vacuna') {
+      emailPayload.datos.nombreVacuna = nombre;
+    } else if (tipo === 'desparasitacion') {
+      emailPayload.datos.nombreDesparasitacion = nombre;
+    }
+
+    await this.emailService.enviarEmailRecordatorio(emailPayload).toPromise();
+
+  } catch (error) {
+    console.error('Error al actualizar recordatorio:', error);
+  } finally {
+    loading.dismiss();
   }
+}
+
 
   private async actualizarEstadoPorRid(nombreColeccion: string, rid: string, datosActualizar: any) {
     const colRef = collection(this.firestore, nombreColeccion);

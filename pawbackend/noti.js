@@ -17,6 +17,7 @@ router.post('/enviar-email-recordatorio', async (req, res) => {
   let mensaje = '';
 
   if (tipo === 'vacuna') {
+    asunto = `Nuevo recordatorio de vacuna registrado en PawCare`;
     mensaje = `
       <h3>🐾 Nueva vacuna registrada para tu mascota</h3>
       <p><strong>Mascota:</strong> ${datos.nombreMascota}</p>
@@ -24,19 +25,9 @@ router.post('/enviar-email-recordatorio', async (req, res) => {
       <p><strong>Fecha:</strong> ${new Date(datos.fecha).toLocaleString()}</p>
       <p><strong>Estado:</strong> ${datos.estado}</p>
     `;
-  } else if (tipo === 'medicamento') {
-    mensaje = mensaje = `
-      <h3>💊 Nuevo medicamento registrado</h3>
-      <p><strong>Mascota:</strong> ${datos.nombreMascota}</p>
-      <p><strong>Medicamento:</strong> ${datos.nombreMedicamento}</p>
-      <p><strong>Dosis:</strong> ${datos.dosis}</p>
-      <p><strong>Duración:</strong> ${datos.duracion} días</p>
-      <p><strong>Frecuencia:</strong> Cada ${datos.frecuenciaHoras} horas</p>
-      <p><strong>Fecha inicio:</strong> ${new Date(datos.fecha).toLocaleString()}</p>
-      <p><strong>Estado:</strong> ${datos.estado}</p>
-    `;
   } else if (tipo === 'desparasitacion') {
-    mensaje = mensaje = `
+    asunto = `Nuevo recordatorio de desparasitación registrado en PawCare`;
+    mensaje = `
       <h3>🦠 Nueva desparasitación registrada</h3>
       <p><strong>Mascota:</strong> ${datos.nombreMascota}</p>
       <p><strong>Tratamiento:</strong> ${datos.nombreDesparasitacion}</p>
@@ -46,7 +37,7 @@ router.post('/enviar-email-recordatorio', async (req, res) => {
   } else {
     return res.status(400).send({ error: 'Tipo de recordatorio no válido' });
   }
-
+  
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {

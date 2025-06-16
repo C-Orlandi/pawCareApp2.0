@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar color="tertiary">
     <ion-title>Registro Médico Personal</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="cerrar()">Cerrar</ion-button>
@@ -8,69 +8,70 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="registroForm" (ngSubmit)="guardarRegistro()">
+  <ion-card>
+    <ion-card-content>
+      <form [formGroup]="registroForm" (ngSubmit)="guardarRegistro()">
 
-    <ion-item>
-      <ion-label position="floating">Fecha de visita</ion-label>
-      <ion-datetime
-        formControlName="fechaVisita"
-        presentation="date"
-        [max]="hoy">
-      </ion-datetime>
-    </ion-item>
-    <ion-text color="danger" *ngIf="registroForm.get('fechaVisita')?.touched && registroForm.get('fechaVisita')?.hasError('required')">
-      <p class="ion-padding-start">La fecha es obligatoria.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Fecha de visita <ion-text color="danger">*</ion-text></ion-label>
+          <ion-datetime formControlName="fechaVisita" presentation="date" [max]="hoy"></ion-datetime>
+        </ion-item>
+        <ion-text color="danger" *ngIf="registroForm.get('fechaVisita')?.touched && registroForm.get('fechaVisita')?.hasError('required')">
+          <p class="ion-padding-start">La fecha es obligatoria.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Motivo de la visita <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input formControlName="motivo"></ion-input>
-    </ion-item>
-    <ion-text color="danger" *ngIf="registroForm.get('motivo')?.touched">
-      <p class="ion-padding-start" *ngIf="registroForm.get('motivo')?.hasError('minlength')">Debe tener al menos 3 letras.</p>
-      <p class="ion-padding-start" *ngIf="registroForm.get('motivo')?.hasError('pattern')">Solo letras y espacios.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Motivo de la visita <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="motivo"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="registroForm.get('motivo')?.touched">
+          <p class="ion-padding-start" *ngIf="registroForm.get('motivo')?.hasError('minlength')">Debe tener al menos 3 letras.</p>
+          <p class="ion-padding-start" *ngIf="registroForm.get('motivo')?.hasError('pattern')">Solo letras y espacios.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Veterinario(a) <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input formControlName="veterinario"></ion-input>
-    </ion-item>
-    <ion-text color="danger" *ngIf="registroForm.get('veterinario')?.touched">
-      <p class="ion-padding-start" *ngIf="registroForm.get('veterinario')?.hasError('minlength')">Debe tener al menos 3 letras.</p>
-      <p class="ion-padding-start" *ngIf="registroForm.get('veterinario')?.hasError('pattern')">Solo letras y espacios.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Veterinario(a) <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="veterinario"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="registroForm.get('veterinario')?.touched">
+          <p class="ion-padding-start" *ngIf="registroForm.get('veterinario')?.hasError('minlength')">Debe tener al menos 3 letras.</p>
+          <p class="ion-padding-start" *ngIf="registroForm.get('veterinario')?.hasError('pattern')">Solo letras y espacios.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Diagnóstico <ion-text color="danger">*</ion-text></ion-label>
-      <ion-textarea formControlName="diagnostico"></ion-textarea>
-    </ion-item>
-    <ion-text color="danger" *ngIf="registroForm.get('diagnostico')?.touched">
-      <p class="ion-padding-start" *ngIf="registroForm.get('diagnostico')?.hasError('required')">Este campo es obligatorio.</p>
-      <p class="ion-padding-start" *ngIf="registroForm.get('diagnostico')?.hasError('minlength')">Debe tener al menos 3 letras.</p>
-      <p class="ion-padding-start" *ngIf="registroForm.get('diagnostico')?.hasError('pattern')">Solo letras y espacios.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Diagnóstico <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea formControlName="diagnostico"></ion-textarea>
+        </ion-item>
+        <ion-text color="danger" *ngIf="registroForm.get('diagnostico')?.touched">
+          <p class="ion-padding-start" *ngIf="registroForm.get('diagnostico')?.hasError('required')">Este campo es obligatorio.</p>
+          <p class="ion-padding-start" *ngIf="registroForm.get('diagnostico')?.hasError('minlength')">Debe tener al menos 3 letras.</p>
+          <p class="ion-padding-start" *ngIf="registroForm.get('diagnostico')?.hasError('pattern')">Solo letras y espacios.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Tratamiento / Recomendaciones <ion-text color="danger">*</ion-text></ion-label>
-      <ion-textarea formControlName="tratamiento"></ion-textarea>
-    </ion-item>
-    <ion-text color="danger" *ngIf="registroForm.get('tratamiento')?.touched && registroForm.get('tratamiento')?.value">
-      <p class="ion-padding-start" *ngIf="registroForm.get('tratamiento')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
-      <p class="ion-padding-start" *ngIf="registroForm.get('tratamiento')?.hasError('pattern')">Solo letras, números y signos permitidos.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Tratamiento / Recomendaciones <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea formControlName="tratamiento"></ion-textarea>
+        </ion-item>
+        <ion-text color="danger" *ngIf="registroForm.get('tratamiento')?.touched && registroForm.get('tratamiento')?.value">
+          <p class="ion-padding-start" *ngIf="registroForm.get('tratamiento')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
+          <p class="ion-padding-start" *ngIf="registroForm.get('tratamiento')?.hasError('pattern')">Solo letras, números y signos permitidos.</p>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Medicamentos indicados <ion-text color="danger">*</ion-text></ion-label>
-      <ion-textarea formControlName="medicamentos"></ion-textarea>
-    </ion-item>
-    <ion-text color="danger" *ngIf="registroForm.get('medicamentos')?.touched">
-      <p class="ion-padding-start" *ngIf="registroForm.get('medicamentos')?.hasError('required')">Este campo es obligatorio.</p>
-      <p class="ion-padding-start" *ngIf="registroForm.get('medicamentos')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
-      <p class="ion-padding-start" *ngIf="registroForm.get('medicamentos')?.hasError('pattern')">Solo letras, números y signos permitidos.</p>
-    </ion-text>
+        <ion-item lines="inset">
+          <ion-label position="floating">Medicamentos indicados <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea formControlName="medicamentos"></ion-textarea>
+        </ion-item>
+        <ion-text color="danger" *ngIf="registroForm.get('medicamentos')?.touched">
+          <p class="ion-padding-start" *ngIf="registroForm.get('medicamentos')?.hasError('required')">Este campo es obligatorio.</p>
+          <p class="ion-padding-start" *ngIf="registroForm.get('medicamentos')?.hasError('minlength')">Debe tener al menos 3 caracteres.</p>
+          <p class="ion-padding-start" *ngIf="registroForm.get('medicamentos')?.hasError('pattern')">Solo letras, números y signos permitidos.</p>
+        </ion-text>
 
-    <ion-button expand="block" type="submit" class="ion-margin-top" color="primary">
-      {{ registro ? 'Actualizar' : 'Guardar' }} Registro
-    </ion-button>
-  </form>
+        <ion-button expand="block" shape="round" size="large" type="submit" class="ion-margin-top" color="dark">
+          {{ registro ? 'Actualizar' : 'Guardar' }} Registro
+        </ion-button>
+        
+      </form>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

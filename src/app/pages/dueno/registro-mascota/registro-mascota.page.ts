@@ -17,6 +17,7 @@ import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { v4 as uuidv4 } from 'uuid';
+import { ModalController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-registro-mascota',
@@ -48,16 +49,17 @@ export class RegistroMascotaPage implements OnInit {
     private menuController: MenuController,
     private http: HttpClient,
     private route: ActivatedRoute,
+    private modalController: ModalController
   ) {
     this.mascotaForm = this.fb.group({
-      nombre: ['', Validators.required],
-      tipo: ['', Validators.required],
-      raza: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      tipo: ['', [Validators.required, Validators.minLength(2)]],
+      raza: ['', [Validators.required, Validators.minLength(2)]],
       sexo: ['', Validators.required],
       fechaNacimiento: ['', Validators.required],
-      color: ['', Validators.required],
-      chip: [''],
-      peso: ['', [Validators.required, Validators.min(0)]],
+      color: ['', [Validators.required, Validators.minLength(3)]],
+      chip: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      peso: [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]{1,2})?$')]],
       categoria: ['', Validators.required],
       tieneVacunas: [false]
     });
@@ -112,11 +114,6 @@ export class RegistroMascotaPage implements OnInit {
     const file = event.target.files[0];
     if (file) {
       this.imagenFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagenPreview = reader.result as string;
-      };
-      reader.readAsDataURL(file);
     }
   }
 
@@ -203,4 +200,8 @@ export class RegistroMascotaPage implements OnInit {
       });
     }
   }
+
+  cerrar() {
+  this.router.navigate(['/mis-mascotas']);
+}
 }

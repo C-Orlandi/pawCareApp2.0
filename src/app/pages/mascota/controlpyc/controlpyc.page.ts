@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { ControlpycService } from 'src/app/services/controlpyc.service';
 import { ModalControlpycComponent } from 'src/app/components/modal-controlpyc/modal-controlpyc.component';
 import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
+import { LoadingController } from '@ionic/angular/standalone';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-controlpyc',
@@ -15,7 +17,6 @@ import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
   imports: [CommonModule, IonicModule, FormsModule]
 })
 export class ControlpycPage implements OnInit {
-
   controles$!: Observable<any[]>;
   controles: any[] = [];
   mascotaSeleccionada: any;
@@ -24,7 +25,8 @@ export class ControlpycPage implements OnInit {
     private controlService: ControlpycService,
     private modalController: ModalController,
     private alertController: AlertController,
-    private exportarpdf: ExportarpdfService
+    private exportarpdf: ExportarpdfService,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {
@@ -37,7 +39,6 @@ export class ControlpycPage implements OnInit {
 
   cargarControles() {
     this.controles$ = this.controlService.obtenerControles(this.mascotaSeleccionada.mid);
-
     this.controles$.subscribe((data) => {
       this.controles = data || [];
     });
@@ -66,8 +67,34 @@ export class ControlpycPage implements OnInit {
           text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            await this.controlService.eliminarControl(cid);
-            this.cargarControles();
+            const loading = await this.loadingController.create({
+              message: 'Eliminando...',
+              spinner: 'crescent',
+            });
+            await loading.present();
+
+            try {
+              await this.controlService.eliminarControl(cid);
+              this.cargarControles();
+
+              await loading.dismiss();
+              Swal.fire({
+                icon: 'success',
+                title: 'Registro eliminado',
+                text: 'El registro fue eliminado correctamente.',
+                confirmButtonText: 'OK',
+                heightAuto: false
+              });
+            } catch (error) {
+              await loading.dismiss();
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo eliminar el registro.',
+                confirmButtonText: 'OK',
+                heightAuto: false
+              });
+            }
           }
         }
       ]

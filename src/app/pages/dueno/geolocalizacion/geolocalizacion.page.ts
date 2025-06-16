@@ -35,7 +35,7 @@ export class GeolocalizacionPage implements OnInit {
 
   circle: google.maps.Circle | null = null;
 
-  tipoVeterinaria: '' | 'todos' | 'domestico' | 'exotico' = '';
+  tipoVeterinaria: '' | 'domestico' | 'exotico' = '';
 
   cargando = false;
 
@@ -113,103 +113,46 @@ export class GeolocalizacionPage implements OnInit {
 
     const url = 'http://localhost:3000/api/veterinarias';
     const location = `${this.userLat},${this.userLng}`;
-    const radiusParam = '30000'; // fijo para evitar uso de radio manual
+    const radiusParam = '30000';
 
-    if (this.tipoVeterinaria === 'todos') {
-      const queryDomestico = 'veterinarias para mascotas domesticas';
-      const queryExotico = 'veterinarias exoticas';
+    let query = this.tipoVeterinaria === 'domestico'
+      ? 'veterinarias para mascotas domesticas'
+      : 'veterinarias exoticas';
 
-      Promise.all([
-        this.http.get<any>(url, {
-          params: { location, query: queryDomestico, radius: radiusParam }
-        }).toPromise(),
-        this.http.get<any>(url, {
-          params: { location, query: queryExotico, radius: radiusParam }
-        }).toPromise()
-      ]).then(results => {
-        let combinedResults: any[] = [];
-        results.forEach(r => {
-          if (r && r.results) {
-            combinedResults = combinedResults.concat(r.results);
-          }
-        });
+    this.http.get<any>(url, {
+      params: { location, query, radius: radiusParam }
+    }).subscribe(async res => {
+      console.log(`✅ Resultados para ${this.tipoVeterinaria}:`, res.results);
 
-        console.log('✅ Veterinarias combinadas:', combinedResults);
-
-        const uniqueResults = combinedResults.filter((v, i, a) =>
-          a.findIndex(t => t.place_id === v.place_id) === i);
-
-        this.markers = uniqueResults
-          .slice(0, 100)
-          .map(place => {
-            const isExotica = place.name.toLowerCase().includes('exot') || place.types?.some((t: string) => t.includes('exot'));
-            return {
-              position: {
-                lat: place.geometry.location.lat,
-                lng: place.geometry.location.lng,
-              },
-              title: place.name,
-              placeId: place.place_id,
-              options: {
-                icon: isExotica
-                  ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-                  : 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-              },
-            };
-          });
-
-        console.log('✅ Marcadores:', this.markers);
-        this.cargando = false;
-      }).catch(async (error) => {
-        console.error('❌ Error al buscar veterinarias (todos):', error);
-        this.cargando = false;
-        const alert = await this.alertCtrl.create({
-          header: 'Error',
-          message: 'No se pudo cargar veterinarias desde el backend.',
-          buttons: ['OK'],
-        });
-        await alert.present();
+      this.markers = res.results
+        .slice(0, 100)
+        .map((place: any) => ({
+          position: {
+            lat: place.geometry.location.lat,
+            lng: place.geometry.location.lng,
+          },
+          title: place.name,
+          placeId: place.place_id,
+          options: {
+            icon: this.tipoVeterinaria === 'domestico'
+              ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+              : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+          },
+        }));
+      console.log('✅ Marcadores cargados:', this.markers);
+      this.cargando = false;
+    }, async (error) => {
+      console.error('❌ Error al buscar veterinarias:', error);
+      this.cargando = false;
+      const alert = await this.alertCtrl.create({
+        header: 'Error',
+        message: 'No se pudo cargar veterinarias desde el backend.',
+        buttons: ['OK'],
       });
-
-    } else {
-      let query = this.tipoVeterinaria === 'domestico'
-        ? 'veterinarias para mascotas domesticas'
-        : 'veterinarias exoticas';
-
-      this.http.get<any>(url, {
-        params: { location, query, radius: radiusParam }
-      }).subscribe(async res => {
-        console.log(`✅ Resultados para ${this.tipoVeterinaria}:`, res.results);
-
-        this.markers = res.results
-          .slice(0, 100)
-          .map((place: any) => ({
-            position: {
-              lat: place.geometry.location.lat,
-              lng: place.geometry.location.lng,
-            },
-            title: place.name,
-            placeId: place.place_id,
-            options: {
-              icon: this.tipoVeterinaria === 'domestico'
-                ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-                : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            },
-          }));
-        console.log('✅ Marcadores cargados:', this.markers);
-        this.cargando = false;
-      }, async (error) => {
-        console.error('❌ Error al buscar veterinarias:', error);
-        this.cargando = false;
-        const alert = await this.alertCtrl.create({
-          header: 'Error',
-          message: 'No se pudo cargar veterinarias desde el backend.',
-          buttons: ['OK'],
-        });
-        await alert.present();
-      });
-    }
+      await alert.present();
+    });
   }
+
 
   estaDentroDelRadio(lat: number, lng: number): boolean {
     return true; // se desactiva el filtro por radio

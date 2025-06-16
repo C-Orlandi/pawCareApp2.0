@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, AlertController } from '@ionic/angular';
 import { collection, query, where, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { collectionData, Firestore } from '@angular/fire/firestore';
-import { ModalRmedicoComponent } from 'src/app/components/modal-rmedico/modal-rmedico.component';
 import { Observable } from 'rxjs';
-import { AlertController } from '@ionic/angular/standalone';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { ModalRmedicoComponent } from 'src/app/components/modal-rmedico/modal-rmedico.component';
 import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
+import { LoadingController } from '@ionic/angular/standalone';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-historial',
@@ -18,14 +17,16 @@ import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
   imports: [CommonModule, IonicModule],
 })
 export class HistorialPage implements OnInit {
+  registros$!: Observable<any[]>;
   registros: any[] = [];
   mascotaSeleccionada: any;
-  
+
   constructor(
     private firestore: Firestore,
     private modalController: ModalController,
     private alertController: AlertController,
-    private expotarpdf: ExportarpdfService
+    private exportarpdf: ExportarpdfService,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {
@@ -37,27 +38,25 @@ export class HistorialPage implements OnInit {
   }
 
   cargarRegistros() {
-  const ref = collection(this.firestore, 'registrosMedicos');
-  const q = query(
-    ref,
-    where('mid', '==', this.mascotaSeleccionada?.mid),
-    orderBy('fechaVisita', 'desc')
-  );
+    const ref = collection(this.firestore, 'registrosMedicos');
+    const q = query(
+      ref,
+      where('mid', '==', this.mascotaSeleccionada?.mid),
+      orderBy('fechaVisita', 'desc')
+    );
 
-  collectionData(q, { idField: 'rid' }).subscribe(data => {
-    this.registros = data;
-  });
- }
+    this.registros$ = collectionData(q, { idField: 'rid' });
+    this.registros$.subscribe(data => this.registros = data);
+  }
 
   async abrirModalRegistro() {
     const modal = await this.modalController.create({
-      component: ModalRmedicoComponent
+      component: ModalRmedicoComponent,
+      componentProps: { mid: this.mascotaSeleccionada.mid }
     });
 
     modal.onDidDismiss().then(result => {
-      if (result.data) {
-        this.cargarRegistros();
-      }
+      if (result.data) this.cargarRegistros();
     });
 
     await modal.present();
@@ -70,26 +69,55 @@ export class HistorialPage implements OnInit {
     });
 
     modal.onDidDismiss().then(result => {
-      if (result.data) {
-        this.cargarRegistros();
-      }
+      if (result.data) this.cargarRegistros();
     });
 
     await modal.present();
   }
 
-  async eliminarRegistro(id: string) {
+  async eliminarRegistro(rid: string) {
     const alert = await this.alertController.create({
       header: 'Eliminar',
-      message: '¿Estás seguro de que deseas eliminar este registro?',
+      message: '¿Estás seguro de eliminar este registro?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            await deleteDoc(doc(this.firestore, 'registrosMedicos', id));
-            this.cargarRegistros();
+            const loading = await this.loadingController.create({
+              message: 'Eliminando...',
+              spinner: 'circles',
+            });
+
+            await loading.present();
+
+            try {
+              await deleteDoc(doc(this.firestore, 'registrosMedicos', rid));
+              this.cargarRegistros();
+
+              await loading.dismiss();
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Registro eliminado',
+                text: 'El historial médico fue eliminado correctamente.',
+                confirmButtonText: 'OK',
+                heightAuto: false
+              });
+            } catch (error) {
+              await loading.dismiss();
+
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ocurrió un error al eliminar el registro.',
+                confirmButtonText: 'OK',
+                heightAuto: false
+              });
+
+              console.error('❌ Error eliminando registro:', error);
+            }
           }
         }
       ]
@@ -98,13 +126,28 @@ export class HistorialPage implements OnInit {
     await alert.present();
   }
 
-  exportarPDF() {
-  this.expotarpdf.exportarHistorialMedico(this.registros, this.mascotaSeleccionada?.nombre, this.formatearFecha);
-}
-
   formatearFecha(fecha: string): string {
-    return new Date(fecha).toLocaleDateString();
+    if (!fecha) return 'N/A';
+    return new Date(fecha).toLocaleDateString('es-CL');
   }
 
-  
+  exportarPDF() {
+    if (!this.registros || this.registros.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Sin historial médico',
+        text: 'No hay registros para exportar.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
+      return;
+    }
+
+    this.exportarpdf.exportarHistorialMedico(
+      this.registros,
+      this.mascotaSeleccionada?.nombre,
+      this.formatearFecha
+    );
+  }
+
 }

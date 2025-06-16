@@ -1,9 +1,13 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="tertiary">
     <ion-title>Control de Peso y Crecimiento</ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="exportarPDF()">
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Exportar PDF
+      </ion-button>
       <ion-button (click)="abrirModalControl()">
-        <ion-icon name="add"></ion-icon>
+        <ion-icon name="add" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -11,14 +15,25 @@
 
 <ion-content class="ion-padding">
   <ion-list *ngIf="controles$ | async as controles; else cargando">
-    <ion-item *ngFor="let item of controles" lines="inset" button (click)="abrirModalControl(item)">
+    <ion-item
+      *ngFor="let item of controles"
+      lines="inset"
+      button
+      (click)="abrirModalControl(item)"
+      class="vacuna-item"
+    >
       <ion-label>
-        <h2>Peso: {{ item.peso }} kg</h2>
-        <p>Tamaño: {{ item.tamano }} cm</p>
-        <p>Fecha: {{ formatearFechaHora(item.fecha) }}</p>
-        <p>Observaciones: {{ item.observaciones }}</p>
+        <h2 class="titulo">{{ item.peso }} kg</h2>
+        <p>📅 {{ formatearFechaHora(item.fecha) }}</p>
+        <p *ngIf="item.observaciones">{{ item.observaciones }}</p>
       </ion-label>
-      <ion-button fill="clear" color="danger" slot="end" (click)="eliminarControl(item.cid); $event.stopPropagation()">
+
+      <ion-button
+        fill="clear"
+        color="danger"
+        slot="end"
+        (click)="eliminarControl(item.cid); $event.stopPropagation()"
+      >
         <ion-icon name="trash"></ion-icon>
       </ion-button>
     </ion-item>
@@ -27,10 +42,6 @@
       <ion-label class="ion-text-center">No hay registros de control.</ion-label>
     </ion-item>
   </ion-list>
-
-  <ion-button expand="block" (click)="exportarPDF()">
-    Exportar PDF de Controles
-  </ion-button>
 
   <ng-template #cargando>
     <div class="cargando-spinner">

@@ -1,65 +1,51 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Mascota } from 'src/app/interfaces/mascota';
 
 @Component({
   selector: 'app-modal-mascota',
   templateUrl: './modal-mascota.component.html',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule]
 })
 export class ModalMascotaComponent implements OnInit {
-
   @Input() mascota?: Mascota;
 
-  mid = '';
-  nombre = '';
-  tipo = '';
-  raza = '';
-  fechaNacimiento = '';
-  edad = '';
-  peso = '';
-  imagen = '';
-  usuarioUid = '';
+  mascotaForm!: FormGroup;
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit() {
-    if (this.mascota) {
-      this.mid = this.mascota.mid;
-      this.nombre = this.mascota.nombre;
-      this.tipo = this.mascota.tipo;
-      this.raza = this.mascota.raza;
-      this.fechaNacimiento = this.mascota.fechaNacimiento;
-      this.edad = this.mascota.edad;
-      this.peso = this.mascota.peso;
-      this.imagen = this.mascota.imagen;
-      this.usuarioUid = this.mascota.usuarioUid;
-    } else {
-      this.mid = this.generarMID();
-    }
+    this.mascotaForm = this.fb.group({
+      nombre: [this.mascota?.nombre || '', Validators.required],
+      tipo: [this.mascota?.tipo || '', Validators.required],
+      raza: [this.mascota?.raza || ''],
+      fechaNacimiento: [this.mascota?.fechaNacimiento || '', Validators.required],
+      edad: [this.mascota?.edad || ''],
+      peso: [this.mascota?.peso || ''],
+      imagen: [this.mascota?.imagen || '']
+    });
   }
 
   guardar() {
+    if (this.mascotaForm.invalid) return;
+
     const mascotaGuardada: Mascota = {
-      mid: this.mid,
-      nombre: this.nombre,
-      tipo: this.tipo,
-      raza: this.raza,
-      fechaNacimiento: this.fechaNacimiento,
-      edad: this.edad,
-      peso: this.peso,
-      imagen: this.imagen,
-      usuarioUid: this.usuarioUid || 'desconocido'
+      ...this.mascotaForm.value,
+      mid: this.mascota?.mid || this.generarMID(),
+      usuarioUid: this.mascota?.usuarioUid || 'desconocido'
     };
 
     this.modalCtrl.dismiss(mascotaGuardada);
   }
 
-  cancelar() {
-    this.modalCtrl.dismiss();
+  cerrar() {
+    this.modalCtrl.dismiss(false);
   }
 
   generarMID() {

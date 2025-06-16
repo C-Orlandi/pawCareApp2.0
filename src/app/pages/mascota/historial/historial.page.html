@@ -1,19 +1,26 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar color="tertiary">
     <ion-title>Historial Médico</ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="exportarPDF()">
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Exportar PDF
+      </ion-button>
       <ion-button (click)="abrirModalRegistro()">
-        <ion-icon name="add"></ion-icon>
-        <ion-button expand="block" color="medium" (click)="exportarPDF()">Exportar a PDF</ion-button>
+        <ion-icon name="add" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-<div id="historial-content">
-  <ion-list *ngIf="registros.length > 0; else cargando">
-    <ion-item *ngFor="let registro of registros" lines="inset" button (click)="editarRegistro(registro)">
+  <ion-list *ngIf="registros$ | async as registros; else cargando">
+    <ion-item
+      *ngFor="let registro of registros"
+      lines="inset"
+      button
+      (click)="editarRegistro(registro)"
+    >
       <ion-label>
         <h2>{{ formatearFecha(registro.fechaVisita) }}</h2>
         <p><strong>Motivo:</strong> {{ registro.motivo }}</p>
@@ -23,25 +30,26 @@
         <p *ngIf="registro.medicamentos"><strong>Medicamentos:</strong> {{ registro.medicamentos }}</p>
         <p *ngIf="registro.notas"><strong>Notas:</strong> {{ registro.notas }}</p>
       </ion-label>
-      <ion-button fill="clear" color="danger" name="end" (click)="eliminarRegistro(registro.rid); $event.stopPropagation()">
+
+      <ion-button
+        fill="clear"
+        color="danger"
+        slot="end"
+        (click)="eliminarRegistro(registro.rid); $event.stopPropagation()"
+      >
         <ion-icon name="trash"></ion-icon>
       </ion-button>
     </ion-item>
 
- <ion-button expand="block" (click)="exportarPDF()">
-   Exportar PDF de Vacunas
- </ion-button>
-
     <ion-item *ngIf="registros.length === 0">
-      <ion-label text-center>No hay registros médicos.</ion-label>
+      <ion-label class="ion-text-center">No hay registros médicos.</ion-label>
     </ion-item>
   </ion-list>
-  </div>
 
-    <ng-template #cargando>
+  <ng-template #cargando>
     <div class="cargando-spinner">
       <ion-spinner name="crescent" color="primary"></ion-spinner>
-      <p>Cargando historial médico...</p>
+      <p class="ion-text-center">Cargando historial médico...</p>
     </div>
   </ng-template>
 </ion-content>

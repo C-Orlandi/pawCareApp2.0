@@ -4,7 +4,7 @@ import { IonicRouteStrategy } from '@ionic/angular';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { add, create, person, trash } from 'ionicons/icons';
+import { add, arrowBack, create, person, trash } from 'ionicons/icons';
 
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -21,7 +21,8 @@ addIcons({
   add,
   trash,
   person,
-  create
+  create,
+  arrowBack
 });
 
 const firebaseConfig = {

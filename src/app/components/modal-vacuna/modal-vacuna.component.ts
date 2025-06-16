@@ -8,6 +8,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import Swal from 'sweetalert2';
+import { LoadingController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-modal-vacuna',
@@ -29,12 +31,16 @@ export class ModalVacunaComponent implements OnInit {
     private firestore: Firestore,
     private toastController: ToastController,
     private modalCtrl: ModalController,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {
     this.vacunaForm = this.fb.group({
-      nombre: [this.vacuna?.nombre || '', Validators.required],
+      nombre: ['', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')]],  
       fechaHora: [this.vacuna?.fechayhora || '', Validators.required]
     });
 
@@ -55,7 +61,22 @@ export class ModalVacunaComponent implements OnInit {
   }
 
   async guardarVacuna() {
-    if (this.vacunaForm.invalid || !this.mid) return;
+    if (this.vacunaForm.invalid) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario inválido',
+        text: 'Por favor completa todos los campos correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+      spinner: 'circles'
+    });
+    await loading.present();
 
     const formValue = this.vacunaForm.value;
     const formData = {
@@ -65,7 +86,6 @@ export class ModalVacunaComponent implements OnInit {
       uid: this.usuarioLogin || 'desconocido',
       creadaEn: new Date(),
       estado: 'aplicada',
-      //
     };
 
     try {
@@ -80,11 +100,29 @@ export class ModalVacunaComponent implements OnInit {
         await updateDoc(doc(this.firestore, 'vacunasMascotas', vacunaId), { vid: vacunaId });
       }
 
-      this.presentToast('Vacuna guardada correctamente');
-      this.modalCtrl.dismiss(true);
+      await loading.dismiss();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Registro Exitoso',
+        text: 'Vacuna guardada correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      }).then(() => {
+        this.modalCtrl.dismiss(true);
+      });
+
     } catch (error) {
-      this.presentToast('Error al guardar la vacuna');
-      console.error('Error al guardar la vacuna:', error);
+      await loading.dismiss();
+      console.error('🔥 Error al guardar vacuna:', error);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al guardar la vacuna. Intenta nuevamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
     }
   }
 

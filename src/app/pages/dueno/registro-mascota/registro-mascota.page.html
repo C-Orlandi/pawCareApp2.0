@@ -1,83 +1,122 @@
 <ion-header>
-  <ion-toolbar color="purple">
+  <ion-toolbar color="tertiary">
     <ion-title>{{ modoEdicion ? 'Editar Mascota' : 'Registrar Mascota' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="mascotaForm" (ngSubmit)="guardarMascota()">
 
-    <ion-item>
-      <ion-label position="floating">Nombre</ion-label>
-      <ion-input formControlName="nombre"></ion-input>
-    </ion-item>
+  <ion-card>
+    <ion-card-content>
+      <form [formGroup]="mascotaForm" (ngSubmit)="guardarMascota()">
 
-    <ion-item>
-      <ion-label position="floating">Especie</ion-label>
-      <ion-input formControlName="tipo"></ion-input>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label position="floating">Nombre <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="nombre"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('nombre')?.invalid && mascotaForm.get('nombre')?.touched">
+          <small>Este campo es obligatorio y debe tener al menos 2 caracteres.</small>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Raza</ion-label>
-      <ion-input formControlName="raza"></ion-input>
-    </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Sexo</ion-label>
-      <ion-select formControlName="sexo">
-        <ion-select-option value="Macho">Macho</ion-select-option>
-        <ion-select-option value="Hembra">Hembra</ion-select-option>
-      </ion-select>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label position="floating">Especie <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="tipo"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('tipo')?.invalid && mascotaForm.get('tipo')?.touched">
+          <small>Este campo es obligatorio y debe tener al menos 2 caracteres.</small>
+        </ion-text>
+        
 
-    <ion-item>
-      <ion-label position="floating">Fecha de Nacimiento</ion-label>
-      <ion-datetime
-        formControlName="fechaNacimiento"
-        presentation="date"
-        max="2025-12-31"
-        display-format="DD/MM/YYYY">
-      </ion-datetime>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label position="floating">Raza <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="raza"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('raza')?.invalid && mascotaForm.get('raza')?.touched">
+          <small>Este campo es obligatorio y debe tener al menos 2 caracteres.</small>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Color</ion-label>
-      <ion-input formControlName="color"></ion-input>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label position="floating">Sexo <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select formControlName="sexo" placeholder="Seleccionar...">
+            <ion-select-option value="Macho">Macho</ion-select-option>
+            <ion-select-option value="Hembra">Hembra</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('sexo')?.invalid && mascotaForm.get('sexo')?.touched">
+          <small>Este camopo es obligatorio.</small>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Número de chip / identificación</ion-label>
-      <ion-input formControlName="chip"></ion-input>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label position="floating">Fecha de Nacimiento <ion-text color="danger">*</ion-text></ion-label>
+          <ion-datetime
+            formControlName="fechaNacimiento"
+            presentation="date"
+            max="2025-12-31"
+            display-format="DD/MM/YYYY">
+          </ion-datetime>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('fechaNacimiento')?.invalid && mascotaForm.get('fechaNacimiento')?.touched">
+          <small>Este camopo es obligatorio.</small>
+        </ion-text>
 
-    <ion-item>
-      <ion-label position="floating">Peso (kg)</ion-label>
-      <ion-input formControlName="peso" type="number"></ion-input>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label position="floating">Color <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="color"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('color')?.invalid && mascotaForm.get('color')?.touched">
+          <small>Este camopo es obligatorio y debe tener al menos 3 caracteres..</small>
+        </ion-text>
+      
 
-    <ion-item>
-      <ion-label>Categoría</ion-label>
-      <ion-select formControlName="categoria" (ionChange)="onCategoriaChange()">
-        <ion-select-option value="domestico">Doméstico</ion-select-option>
-        <ion-select-option value="exotico">Exótico</ion-select-option>
-      </ion-select>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label position="floating">Número de chip / identificación <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="chip"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('chip')?.invalid && mascotaForm.get('chip')?.touched">
+          <small>Este camopo es obligatorio y solo permite numeros</small>
+        </ion-text>
+      
+        <ion-item lines="inset">
+          <ion-label position="floating">Peso (kg) o (g)</ion-label>
+          <ion-input formControlName="peso" type="number"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('peso')?.invalid && mascotaForm.get('peso')?.touched">
+          <small>Este camopo es obligatorio y solo permite numeros</small>
+        </ion-text>
+      
 
-    <ion-item *ngIf="mascotaForm.get('categoria')?.value === 'exotico'">
-      <ion-label>¿Esta especie tiene vacunas?</ion-label>
-      <ion-checkbox formControlName="tieneVacunas" slot="start"></ion-checkbox>
-    </ion-item>
+        <ion-item lines="inset">
+          <ion-label>Categoría <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select formControlName="categoria" (ionChange)="onCategoriaChange()" placeholder="Seleccionar...">
+            <ion-select-option value="domestico">Doméstico</ion-select-option>
+            <ion-select-option value="exotico">Exótico</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text color="danger" *ngIf="mascotaForm.get('chip')?.invalid && mascotaForm.get('chip')?.touched">
+          <small>Este camopo es obligatorio</small>
+        </ion-text>
+      
 
-    <ion-item lines="none">
-      <ion-label>Foto de la mascota</ion-label>
-      <input type="file" accept="image/*" (change)="seleccionarImagen($event)" />
-    </ion-item>
+        <ion-item lines="inset" *ngIf="mascotaForm.get('categoria')?.value === 'exotico'">
+          <ion-label>¿Esta especie tiene vacunas?</ion-label>
+          <ion-checkbox formControlName="tieneVacunas" slot="start"></ion-checkbox>
+        </ion-item>
 
-    <ion-img *ngIf="imagenPreview" [src]="imagenPreview" class="preview-img"></ion-img>
+        <ion-item lines="inset">
+          <ion-label>Foto de la mascota</ion-label>
+          <input type="file" accept="image/*" (change)="seleccionarImagen($event)" />
+        </ion-item>
 
-    <ion-button expand="block" type="submit" class="ion-margin-top" color="dark" [disabled]="mascotaForm.invalid">
-      {{ modoEdicion ? 'Guardar Cambios' : 'Registrar Mascota' }}
-    </ion-button>
+        <ion-button expand="block" shape="round" size="large" class="ion-margin-top" color="dark" type="submit" [disabled]="mascotaForm.invalid">
+          {{ modoEdicion ? 'Guardar Cambios' : 'Registrar Mascota' }}
+        </ion-button>
 
-  </form>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>

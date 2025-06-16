@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-perfil-menu',
@@ -19,7 +19,7 @@ export class PerfilMenuPage implements OnInit {
   fotoPerfil?: string;
   defaultAvatar: string = 'https://cdn-icons-png.flaticon.com/512/219/219983.png';
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService, private navCtrl: NavController) {}
 
   ngOnInit() {
     const usuario = localStorage.getItem('usuarioLogin');
@@ -55,5 +55,9 @@ export class PerfilMenuPage implements OnInit {
       localStorage.setItem('fotoPerfil', base64);
     };
     reader.readAsDataURL(file);
+  }
+
+  goBack() {
+  this.navCtrl.back();
   }
 }

@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Firestore, collection, doc, addDoc, updateDoc } from '@angular/fire/firestore';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { ModalControlpycComponent } from '../modal-controlpyc/modal-controlpyc.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-modal-rmedico',
@@ -23,7 +24,8 @@ export class ModalRmedicoComponent implements OnInit {
     private fb: FormBuilder,
     private firestore: Firestore,
     private toastController: ToastController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private loadingController: LoadingController
   ) {
     this.registroForm = this.fb.group({
       fechaVisita: [this.hoy, Validators.required],
@@ -47,7 +49,23 @@ export class ModalRmedicoComponent implements OnInit {
   }
 
   async guardarRegistro() {
-    if (this.registroForm.invalid || !this.mascotaSeleccionada) return;
+    if (this.registroForm.invalid || !this.mascotaSeleccionada) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario inválido',
+        text: 'Por favor completa todos los campos correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+      spinner: 'circles'
+    });
+
+    await loading.present();
 
     const data = this.registroForm.value;
 
@@ -62,22 +80,25 @@ export class ModalRmedicoComponent implements OnInit {
       try {
         const docRef = doc(this.firestore, 'registrosMedicos', this.registro.rid);
         await updateDoc(docRef, registroData);
+        
+        await loading.dismiss();
 
-        const toast = await this.toastController.create({
-          message: 'Registro actualizado',
-          duration: 2000,
-          color: 'success'
-        });
-        await toast.present();
-
-        this.modalController.dismiss(true);
+        Swal.fire({
+          icon: 'success',
+          title: 'Registro Actualizado',
+          text: 'El registro médico fue actualizado correctamente.',
+          confirmButtonText: 'OK',
+          heightAuto: false
+        }).then(() => this.modalController.dismiss(true));
       } catch (error) {
-        console.error('Error al actualizar registro médico:', error);
+        console.error('Error al actualizar:', error);
+        await loading.dismiss();
+        this.mostrarMensajeDeError();
       }
 
       return;
     }
-
+        
     const registroData = {
       ...data,
       mid: this.mascotaSeleccionada.mid,
@@ -88,17 +109,30 @@ export class ModalRmedicoComponent implements OnInit {
       const docRef = await addDoc(collection(this.firestore, 'registrosMedicos'), registroData);
       await updateDoc(doc(this.firestore, 'registrosMedicos', docRef.id), { rid: docRef.id });
 
-      const toast = await this.toastController.create({
-        message: 'Registro guardado exitosamente',
-        duration: 2000,
-        color: 'success'
-      });
-      await toast.present();
+      await loading.dismiss();
 
-      this.modalController.dismiss(true);
+      Swal.fire({
+        icon: 'success',
+        title: 'Registro Exitoso',
+        text: 'Registro médico guardado correctamente.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      }).then(() => this.modalController.dismiss(true));
     } catch (error) {
-      console.error('Error al guardar registro médico:', error);
+      console.error('Error al guardar:', error);
+      await loading.dismiss();
+      this.mostrarMensajeDeError();
     }
+  }
+
+  mostrarMensajeDeError() {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Hubo un problema al guardar el registro. Intenta nuevamente.',
+      confirmButtonText: 'OK',
+      heightAuto: false
+    });
   }
 
   cerrar() {

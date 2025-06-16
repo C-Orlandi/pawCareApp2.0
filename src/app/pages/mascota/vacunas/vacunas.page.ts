@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { AlertController, IonicModule, ModalController } from '@ionic/angular';
+import { AlertController, IonicModule, LoadingController, ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { VacunaService } from 'src/app/services/vacuna.service';
 import { ModalVacunaComponent } from 'src/app/components/modal-vacuna/modal-vacuna.component';
 import jsPDF from 'jspdf';
 import { ExportarpdfService } from 'src/app/services/exportarpdf.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vacunas',
@@ -25,7 +26,8 @@ export class VacunasPage implements OnInit {
     private vacunaService: VacunaService,
     private modalController: ModalController,
     private alertController: AlertController,
-    private exportarpdf: ExportarpdfService
+    private exportarpdf: ExportarpdfService,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {
@@ -68,8 +70,34 @@ export class VacunasPage implements OnInit {
           text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            await this.vacunaService.eliminarVacuna(vid);
-            this.cargarVacunas();
+            const loading = await this.loadingController.create({
+              message: 'Eliminando...',
+              spinner: 'circles'
+            });
+            await loading.present();
+
+            try {
+              await this.vacunaService.eliminarVacuna(vid);
+              this.cargarVacunas();
+              await loading.dismiss();
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Eliminación Exitosa',
+                text: 'La vacuna ha sido eliminada correctamente.',
+                confirmButtonText: 'OK',
+                heightAuto: false
+              });
+            } catch (error) {
+              await loading.dismiss();
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al eliminar',
+                text: 'Ocurrió un error al eliminar la vacuna.',
+                confirmButtonText: 'OK',
+                heightAuto: false
+              });
+            }
           }
         }
       ]
@@ -77,6 +105,7 @@ export class VacunasPage implements OnInit {
 
     await alert.present();
   }
+
 
   formatearFechaHora(fechayhora: string): string {
    if (!fechayhora) return 'N/A';
@@ -88,6 +117,17 @@ export class VacunasPage implements OnInit {
   }
 
   exportarPDF() {
+    if (!this.vacunas || this.vacunas.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Sin Historial',
+        text: 'No hay vacunas registradas para exportar.',
+        confirmButtonText: 'OK',
+        heightAuto: false
+      });
+      return;
+    }
+
     this.exportarpdf.exportarVacunas(this.vacunas, this.mascotaSeleccionada?.nombre, this.formatearFechaHora);
   }
 
